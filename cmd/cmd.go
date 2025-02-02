@@ -7,6 +7,7 @@ import (
 
 func Execute() {
 
+	loadEnvVars()
 	flags := getFlags()
 
 	srv := router.NewRouter()

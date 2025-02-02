@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"encoding/json"
+	"icealpha/internal/controllers/auth"
 	"icealpha/internal/router"
 	"log/slog"
 	"net/http"
@@ -10,12 +11,13 @@ import (
 func HandleAll(r *router.Router) {
 
 	HandleAPIIndex("/api", r)
+	HandleOAuthFlow("/api/oauth", r)
 
 }
 
-func HandleAPIIndex(pattern string, router *router.Router) {
+func HandleAPIIndex(pattern string, rtr *router.Router) {
 
-	router.R.Get(pattern, func(w http.ResponseWriter, r *http.Request) {
+	rtr.R.Get(pattern, func(w http.ResponseWriter, r *http.Request) {
 
 		if err := json.NewEncoder(w).Encode(map[string]string{
 
@@ -23,9 +25,61 @@ func HandleAPIIndex(pattern string, router *router.Router) {
 		}); err != nil {
 
 			http.Error(w, "error while serving /api", http.StatusInternalServerError)
-			router.Logger.Error("Failed to serve /api", slog.Attr{Key: "error", Value: slog.StringValue(err.Error())})
+			rtr.Logger.Error("Failed to serve /api", slog.Attr{Key: "error", Value: slog.StringValue(err.Error())})
 
 		}
+
+	})
+
+}
+
+func HandleOAuthFlow(pattern string, rtr *router.Router) {
+
+	rtr.R.Get(pattern, func(w http.ResponseWriter, r *http.Request) {
+
+		provider := r.URL.Query().Get("provider")
+
+		switch provider {
+
+		case "github":
+
+			state := auth.SetNewOAuthStateCookie(w)
+
+			url := auth.GithubOAuthConfig.AuthCodeURL(state)
+			http.Redirect(w, r, url, http.StatusTemporaryRedirect)
+
+		}
+
+	})
+
+}
+
+func HandleOAuthCallback(pattern string, rtr *router.Router) {
+
+	rtr.R.Get(pattern, func(w http.ResponseWriter, r *http.Request) {
+
+		provider := r.URL.Query().Get("provider")
+		var githubUser auth.GithubUser
+		var redirectPath string
+		var err error
+		switch provider {
+		case "github":
+			githubUser, redirectPath, err = auth.HandleGithubOAuthCallback(rtr, auth.GithubOAuthConfig, w, r)
+		}
+		if err != nil {
+			rtr.Logger.Error("err handling google oauth callback", "err", err)
+			http.Redirect(w, r, "/login", http.StatusSeeOther)
+			return
+		}
+
+		// "user" is an instance of User that can be used to
+		// create a new user or sign in an existing user
+
+		// create a session cookie to keep the user signed in
+
+		rtr.Logger.Info(githubUser.Email)
+
+		http.Redirect(w, r, redirectPath, http.StatusSeeOther)
 
 	})
 
