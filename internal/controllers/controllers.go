@@ -10,8 +10,12 @@ import (
 
 func HandleAll(r *router.Router) {
 
+	// set oauth2 config
+	auth.SetGithubOAuthConfig()
+
 	HandleAPIIndex("/api", r)
 	HandleOAuthFlow("/api/oauth", r)
+	HandleOAuthCallback("/api/oauth/{provider}/callback", r)
 
 }
 
@@ -58,28 +62,35 @@ func HandleOAuthCallback(pattern string, rtr *router.Router) {
 
 	rtr.R.Get(pattern, func(w http.ResponseWriter, r *http.Request) {
 
-		provider := r.URL.Query().Get("provider")
-		var githubUser auth.GithubUser
-		var redirectPath string
-		var err error
+		provider := r.PathValue("provider")
+
 		switch provider {
+
 		case "github":
-			githubUser, redirectPath, err = auth.HandleGithubOAuthCallback(rtr, auth.GithubOAuthConfig, w, r)
+
+			var githubUser auth.GithubUser
+			var redirectPath string
+			var err error
+			switch provider {
+			case "github":
+				githubUser, redirectPath, err = auth.HandleGithubOAuthCallback(rtr, auth.GithubOAuthConfig, w, r)
+			}
+			if err != nil {
+				rtr.Logger.Error("err handling github oauth callback", "err", err)
+				http.Redirect(w, r, "/login", http.StatusSeeOther)
+				return
+			}
+
+			// "user" is an instance of User that can be used to
+			// create a new user or sign in an existing user
+
+			// create a session cookie to keep the user signed in
+
+			rtr.Logger.Info(githubUser.Email)
+
+			http.Redirect(w, r, redirectPath, http.StatusSeeOther)
+
 		}
-		if err != nil {
-			rtr.Logger.Error("err handling google oauth callback", "err", err)
-			http.Redirect(w, r, "/login", http.StatusSeeOther)
-			return
-		}
-
-		// "user" is an instance of User that can be used to
-		// create a new user or sign in an existing user
-
-		// create a session cookie to keep the user signed in
-
-		rtr.Logger.Info(githubUser.Email)
-
-		http.Redirect(w, r, redirectPath, http.StatusSeeOther)
 
 	})
 
