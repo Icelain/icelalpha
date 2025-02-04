@@ -43,3 +43,10 @@ func (pd *PostgresDriver) CheckUserExists(ctx context.Context, email string) boo
 	return exists
 
 }
+
+func (pd *PostgresDriver) InsertUser(ctx context.Context, username string, email string) error {
+
+	_, err := pd.conn.Exec(ctx, "INSERT INTO usersrecord(username, email) VALUES ($1, $2)", username, email)
+	return err
+
+}
