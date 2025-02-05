@@ -2,6 +2,7 @@ package router
 
 import (
 	"fmt"
+	"icealpha/internal/database"
 	"icealpha/internal/state"
 	"log/slog"
 	"net/http"
@@ -36,6 +37,7 @@ func NewRouter() *Router {
 
 type RouterConfig struct {
 	Port uint
+	DB   *database.PostgresDriver
 }
 
 func (r *Router) SetConfig(config *RouterConfig) {

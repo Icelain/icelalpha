@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"context"
 	"encoding/json"
 	"icealpha/internal/controllers/auth"
 	"icealpha/internal/router"
@@ -80,15 +81,6 @@ func HandleOAuthCallback(pattern string, rtr *router.Router) {
 				http.Redirect(w, r, "/login", http.StatusSeeOther)
 				return
 			}
-
-			// "user" is an instance of User that can be used to
-			// create a new user or sign in an existing user
-
-			// create a session cookie to keep the user signed in
-
-			rtr.Logger.Info(githubUser.Email)
-
-			http.Redirect(w, r, redirectPath, http.StatusSeeOther)
 
 		}
 
