@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"context"
 	"encoding/json"
 	"icealpha/internal/controllers/auth"
 	"icealpha/internal/router"
@@ -59,7 +58,7 @@ func HandleOAuthFlow(pattern string, rtr *router.Router) {
 
 }
 
-func HandleOAuthCallbackMiddleware(rtr *router.Router) {
+func HandleOAuthCallback(pattern string, rtr *router.Router) {
 
 	rtr.R.Get(pattern, func(w http.ResponseWriter, r *http.Request) {
 
@@ -75,14 +74,22 @@ func HandleOAuthCallbackMiddleware(rtr *router.Router) {
 			switch provider {
 			case "github":
 				githubUser, redirectPath, err = auth.HandleGithubOAuthCallback(rtr, auth.GithubOAuthConfig, w, r)
-			}
-			if err != nil {
-				rtr.Logger.Error("err handling github oauth callback", "err", err)
-				http.Redirect(w, r, "/login", http.StatusSeeOther)
-				return
+				if err != nil {
+					rtr.Logger.Error("err handling github oauth callback", "err", err)
+					http.Redirect(w, r, "/login", http.StatusSeeOther)
+					return
+				}
 			}
 
 		}
+
+	})
+
+}
+
+func HandleSignin(pattern string, rtr *router.Router) {
+
+	rtr.R.Get(pattern, func(w http.ResponseWriter, r *http.Request) {
 
 	})
 
