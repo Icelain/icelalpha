@@ -14,7 +14,7 @@ func HandleAll(r *router.Router) {
 	auth.SetGithubOAuthConfig()
 
 	HandleAPIIndex("/api", r)
-	HandleOAuthFlow("/api/oauth", r)
+	HandleSigninFlow("/api/oauth", r)
 	HandleOAuthCallback("/api/oauth/{provider}/callback", r)
 
 }
@@ -37,7 +37,7 @@ func HandleAPIIndex(pattern string, rtr *router.Router) {
 
 }
 
-func HandleOAuthFlow(pattern string, rtr *router.Router) {
+func HandleSigninFlow(pattern string, rtr *router.Router) {
 
 	rtr.R.Get(pattern, func(w http.ResponseWriter, r *http.Request) {
 
@@ -48,7 +48,6 @@ func HandleOAuthFlow(pattern string, rtr *router.Router) {
 		case "github":
 
 			state := auth.SetNewOAuthStateCookie(w)
-
 			url := auth.GithubOAuthConfig.AuthCodeURL(state)
 			http.Redirect(w, r, url, http.StatusTemporaryRedirect)
 
