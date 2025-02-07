@@ -1,11 +1,14 @@
 package controllers
 
 import (
+	"context"
 	"encoding/json"
 	"icealpha/internal/controllers/auth"
+	"icealpha/internal/database"
 	"icealpha/internal/router"
 	"log/slog"
 	"net/http"
+	"time"
 )
 
 func HandleAll(r *router.Router) {
@@ -47,6 +50,13 @@ func HandleSigninFlow(pattern string, rtr *router.Router) {
 
 		case "github":
 
+			if auth.CheckSessionExists(r) {
+
+				http.Redirect(w, r, "/api", http.StatusTemporaryRedirect)
+				return	
+
+			}
+
 			state := auth.SetNewOAuthStateCookie(w)
 			url := auth.GithubOAuthConfig.AuthCodeURL(state)
 			http.Redirect(w, r, url, http.StatusTemporaryRedirect)
@@ -78,6 +88,32 @@ func HandleOAuthCallback(pattern string, rtr *router.Router) {
 					http.Redirect(w, r, "/login", http.StatusSeeOther)
 					return
 				}
+
+				if rtr.Config.DB.CheckUserExists(context.Background(), githubUser.Email) {
+
+					http.Redirect(w,r,redirectPath, http.StatusTemporaryRedirect)
+					return
+
+				}
+					
+				if err := rtr.Config.DB.InsertUser(context.Background(), githubUser.Name, githubUser.Email); err != nil {
+
+					http.Error(w, "error creating user", http.StatusInternalServerError)
+					return
+
+				}
+
+				http.SetCookie(w, &http.Cookie{
+
+					Name: "usersession",
+					Expires: time.Now().Add(time.Hour * 24),
+					Value: ,
+
+				})
+
+				http.Redirect(w,r,redirectPath, http.StatusTemporaryRedirect)
+				return
+
 			}
 
 		}
