@@ -138,11 +138,3 @@ func HandleOAuthCallback(pattern string, rtr *router.Router) {
 	})
 
 }
-
-func HandleSignin(pattern string, rtr *router.Router) {
-
-	rtr.R.Get(pattern, func(w http.ResponseWriter, r *http.Request) {
-
-	})
-
-}
