@@ -50,3 +50,17 @@ func (pd *PostgresDriver) InsertUser(ctx context.Context, username string, email
 	return err
 
 }
+
+func (pd *PostgresDriver) RemoveUser(ctx context.Context, email string) error {
+
+	_, err := pd.conn.Exec(ctx, "DELETE FROM usersrecord WHERE email=$1", email)
+	return err
+
+}
+
+func (pd *PostgresDriver) UpdateUsername(ctx context.Context, email string, newUsername string) error {
+
+	_, err := pd.conn.Exec(ctx, "UPDATE usersrecord SET username=$1 WHERE email=$2", newUsername, email)
+	return err
+
+}
