@@ -21,7 +21,7 @@ func HandleAll(r *router.Router) {
 	r.S.CookieStore = sessions.NewCookieStore()
 
 	HandleAPIIndex("/api", r)
-	HandleSigninFlow("/api/oauth", r)
+	HandleOAuthFlow("/api/oauth", r)
 	HandleOAuthCallback("/api/oauth/{provider}/callback", r)
 
 }
@@ -44,7 +44,7 @@ func HandleAPIIndex(pattern string, rtr *router.Router) {
 
 }
 
-func HandleSigninFlow(pattern string, rtr *router.Router) {
+func HandleOAuthFlow(pattern string, rtr *router.Router) {
 
 	rtr.R.Get(pattern, func(w http.ResponseWriter, r *http.Request) {
 
