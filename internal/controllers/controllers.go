@@ -4,17 +4,21 @@ import (
 	"context"
 	"encoding/json"
 	"icealpha/internal/controllers/auth"
-	"icealpha/internal/database"
 	"icealpha/internal/router"
 	"log/slog"
 	"net/http"
 	"time"
+
+	"github.com/gorilla/sessions"
 )
 
 func HandleAll(r *router.Router) {
 
 	// set oauth2 config
 	auth.SetGithubOAuthConfig()
+
+	// set cookiestore
+	r.S.CookieStore = sessions.NewCookieStore()
 
 	HandleAPIIndex("/api", r)
 	HandleSigninFlow("/api/oauth", r)
@@ -53,7 +57,7 @@ func HandleSigninFlow(pattern string, rtr *router.Router) {
 			if auth.CheckSessionExists(r) {
 
 				http.Redirect(w, r, "/api", http.StatusTemporaryRedirect)
-				return	
+				return
 
 			}
 
@@ -91,11 +95,11 @@ func HandleOAuthCallback(pattern string, rtr *router.Router) {
 
 				if rtr.Config.DB.CheckUserExists(context.Background(), githubUser.Email) {
 
-					http.Redirect(w,r,redirectPath, http.StatusTemporaryRedirect)
+					http.Redirect(w, r, redirectPath, http.StatusTemporaryRedirect)
 					return
 
 				}
-					
+
 				if err := rtr.Config.DB.InsertUser(context.Background(), githubUser.Name, githubUser.Email); err != nil {
 
 					http.Error(w, "error creating user", http.StatusInternalServerError)
@@ -103,15 +107,28 @@ func HandleOAuthCallback(pattern string, rtr *router.Router) {
 
 				}
 
-				http.SetCookie(w, &http.Cookie{
+				// create a user session cookie
 
-					Name: "usersession",
-					Expires: time.Now().Add(time.Hour * 24),
-					Value: ,
+				session, err := rtr.S.CookieStore.Get(r, "usersession")
+				if err != nil {
 
-				})
+					http.Error(w, "error creating session cookie", http.StatusInternalServerError)
+					return
 
-				http.Redirect(w,r,redirectPath, http.StatusTemporaryRedirect)
+				}
+
+				session.Options.MaxAge = int(time.Now().Add(time.Hour * 24).Unix())
+				session.Values["username"] = githubUser.Name
+				session.Values["email"] = githubUser.Email
+
+				if err = session.Save(r, w); err != nil {
+
+					http.Error(w, "error saving session cookie", http.StatusInternalServerError)
+					return
+
+				}
+
+				http.Redirect(w, r, redirectPath, http.StatusTemporaryRedirect)
 				return
 
 			}
