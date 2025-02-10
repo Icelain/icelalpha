@@ -12,6 +12,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/gorilla/sessions"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/github"
 )
@@ -57,22 +58,16 @@ func SetNewOAuthStateCookie(w http.ResponseWriter) string {
 	return state
 }
 
-func CheckSessionExists(r *http.Request) bool {
+func CheckSessionExists(r *http.Request, session *sessions.CookieStore) bool {
 
-	usersession, err := r.Cookie("usersession")
+	usersession, err := session.Get(r, "usersession")
 	if err != nil {
 
 		return false
 
 	}
 
-	if usersession.Expires.Before(time.Now()) {
-
-		return false
-
-	}
-
-	return true
+	return usersession.IsNew
 
 }
 

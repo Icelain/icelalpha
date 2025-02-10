@@ -54,7 +54,7 @@ func HandleOAuthFlow(pattern string, rtr *router.Router) {
 
 		case "github":
 
-			if auth.CheckSessionExists(r) {
+			if auth.CheckSessionExists(r, rtr.S.CookieStore) {
 
 				http.Redirect(w, r, "/api", http.StatusTemporaryRedirect)
 				return
