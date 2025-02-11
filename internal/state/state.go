@@ -1,7 +1,12 @@
 package state
 
-import "github.com/gorilla/sessions"
+import (
+	"icealpha/internal/database"
+
+	"github.com/gorilla/sessions"
+)
 
 type State struct {
 	CookieStore *sessions.CookieStore
+	DB          *database.PostgresDriver
 }

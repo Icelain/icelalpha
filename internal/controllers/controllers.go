@@ -93,14 +93,14 @@ func HandleOAuthCallback(pattern string, rtr *router.Router) {
 					return
 				}
 
-				if rtr.Config.DB.CheckUserExists(context.Background(), githubUser.Email) {
+				if rtr.S.DB.CheckUserExists(context.Background(), githubUser.Email) {
 
 					http.Redirect(w, r, redirectPath, http.StatusTemporaryRedirect)
 					return
 
 				}
 
-				if err := rtr.Config.DB.InsertUser(context.Background(), githubUser.Name, githubUser.Email); err != nil {
+				if err := rtr.S.DB.InsertUser(context.Background(), githubUser.Name, githubUser.Email); err != nil {
 
 					http.Error(w, "error creating user", http.StatusInternalServerError)
 					return

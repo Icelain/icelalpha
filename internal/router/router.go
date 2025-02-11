@@ -43,6 +43,7 @@ type RouterConfig struct {
 func (r *Router) SetConfig(config *RouterConfig) {
 
 	r.Config = config
+	r.S.DB = config.DB
 
 }
 
