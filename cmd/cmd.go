@@ -16,7 +16,7 @@ func Execute() {
 	db, err := database.CreatePostgresDriver(os.Getenv("POSTGRES_URL"))
 	if err != nil {
 
-		log.Fatal("Could not connect to postgres db")
+		log.Fatal("Could not connect to postgres database: ", err)
 
 	}
 
