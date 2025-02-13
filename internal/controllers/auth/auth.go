@@ -67,7 +67,7 @@ func CheckSessionExists(r *http.Request, session *sessions.CookieStore) bool {
 
 	}
 
-	return usersession.IsNew
+	return !usersession.IsNew
 
 }
 

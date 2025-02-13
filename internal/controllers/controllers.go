@@ -18,7 +18,7 @@ func HandleAll(r *router.Router) {
 	auth.SetGithubOAuthConfig()
 
 	// set cookiestore
-	r.S.CookieStore = sessions.NewCookieStore()
+	r.S.CookieStore = sessions.NewCookieStore([]byte("SESSION_KEY"))
 
 	HandleAPIIndex("/api", r)
 	HandleOAuthFlow("/api/oauth", r)
@@ -123,7 +123,7 @@ func HandleOAuthCallback(pattern string, rtr *router.Router) {
 
 				if err = session.Save(r, w); err != nil {
 
-					http.Error(w, "error saving session cookie", http.StatusInternalServerError)
+					http.Error(w, "error saving session cookie: "+err.Error(), http.StatusInternalServerError)
 					return
 
 				}
