@@ -100,7 +100,7 @@ func HandleOAuthCallback(pattern string, rtr *router.Router) {
 
 				}
 
-				if err := rtr.S.DB.InsertUser(context.Background(), githubUser.Name, githubUser.Email); err != nil {
+				if err := rtr.S.DB.InsertUser(context.Background(), githubUser.Username, githubUser.Email); err != nil {
 
 					http.Error(w, "error creating user", http.StatusInternalServerError)
 					return
@@ -118,7 +118,7 @@ func HandleOAuthCallback(pattern string, rtr *router.Router) {
 				}
 
 				session.Options.MaxAge = int(time.Now().Add(time.Hour * 24).Unix())
-				session.Values["username"] = githubUser.Name
+				session.Values["username"] = githubUser.Username
 				session.Values["email"] = githubUser.Email
 
 				if err = session.Save(r, w); err != nil {

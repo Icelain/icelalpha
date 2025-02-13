@@ -29,6 +29,7 @@ var (
 type GithubUser struct {
 	Email     string `json:"email"`
 	Name      string `json:"name"`
+	Username  string `json:"username`
 	AvatarURL string `json:"avatar_url"`
 }
 
