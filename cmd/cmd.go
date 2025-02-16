@@ -4,6 +4,7 @@ import (
 	"icealpha/internal/controllers"
 	"icealpha/internal/database"
 	"icealpha/internal/router"
+	"icealpha/pkg/imglatex"
 	"log"
 	"os"
 )
@@ -23,8 +24,9 @@ func Execute() {
 	srv := router.NewRouter()
 	srvconfig := router.RouterConfig{
 
-		Port: flags.HttpPort,
-		DB:   db,
+		Port:     flags.HttpPort,
+		DB:       db,
+		ImgLatex: imglatex.NewImgLatex(os.Getenv("GROQ_API_KEY")),
 	}
 
 	srv.SetConfig(&srvconfig)
