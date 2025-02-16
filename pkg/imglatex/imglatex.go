@@ -83,14 +83,20 @@ func (il *ImgLatex) ImageToLatex(image io.Reader) (latex string, err error) {
 
 	}
 
-	base64ImgContent := make([]byte, len(imageContent)*2)
-	base64.StdEncoding.Encode(base64ImgContent, imageContent)
-
-	prompt := fmt.Sprintf(PROMPTJSON, string(base64ImgContent))
+	base64ImgContentString := base64.StdEncoding.EncodeToString(imageContent)
+	prompt := fmt.Sprintf(PROMPTJSON, base64ImgContentString)
 
 	postBuffer := bytes.NewBuffer([]byte(prompt))
 
+	headers := http.Header{
+
+		"Content-Type":  []string{"application/json"},
+		"Authorization": []string{fmt.Sprintf("Bearer %s", il.apiKey)},
+	}
+
 	request, err := http.NewRequest(http.MethodPost, "https://api.groq.com/openai/v1/chat/completions", postBuffer)
+	request.Header = headers
+
 	client := &http.Client{}
 
 	resp, err := client.Do(request)
