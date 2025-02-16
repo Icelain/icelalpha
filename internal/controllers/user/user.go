@@ -38,9 +38,11 @@ func HandleSolveInputImage(pattern string, rtr *router.Router) {
 
 		}
 
+		// latex to answer
+
 		response := map[string]string{
 
-			"content": latex,
+			"content": "tbd",
 		}
 
 		if err = json.NewEncoder(w).Encode(response); err != nil {
