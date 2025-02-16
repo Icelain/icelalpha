@@ -7,6 +7,7 @@ require (
 	github.com/gorilla/sessions v1.4.0
 	github.com/jackc/pgx/v5 v5.7.2
 	github.com/joho/godotenv v1.5.1
+	github.com/liushuangls/go-anthropic v1.6.0
 	golang.org/x/oauth2 v0.25.0
 )
 
