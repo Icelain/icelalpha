@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/gorilla/sessions"
+	"golang.org/x/oauth2"
 )
 
 func HandleAll(r *router.Router) {
@@ -62,7 +63,7 @@ func HandleOAuthFlow(pattern string, rtr *router.Router) {
 			}
 
 			state := auth.SetNewOAuthStateCookie(w)
-			url := auth.GithubOAuthConfig.AuthCodeURL(state)
+			url := auth.GithubOAuthConfig.AuthCodeURL(state, oauth2.ApprovalForce)
 			http.Redirect(w, r, url, http.StatusTemporaryRedirect)
 
 		}
