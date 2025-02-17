@@ -55,3 +55,27 @@ func HandleSolveInputImage(pattern string, rtr *router.Router) {
 	})
 
 }
+
+// POST :: Json(query: string) -> Json(content: string)
+func HandleSolveTextInput(pattern string, rtr *router.Router) {
+
+	rtr.R.Post(pattern, func(w http.ResponseWriter, r *http.Request) {
+
+		defer r.Body.Close()
+
+		queryStruct := struct {
+			Query string `json:"query"`
+		}{}
+
+		if err := json.NewDecoder(r.Body).Decode(&queryStruct); err != nil {
+
+			http.Error(w, "error decoding json query input", http.StatusBadRequest)
+			return
+
+		}
+
+		// convert queryStruct.Query to the result
+
+	})
+
+}
