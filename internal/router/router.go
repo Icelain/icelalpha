@@ -5,6 +5,7 @@ import (
 	"icealpha/internal/database"
 	"icealpha/internal/state"
 	"icealpha/pkg/imglatex"
+	"icealpha/pkg/inference"
 	"log/slog"
 	"net/http"
 	"os"
@@ -37,9 +38,10 @@ func NewRouter() *Router {
 }
 
 type RouterConfig struct {
-	Port     uint
-	DB       *database.PostgresDriver
-	ImgLatex *imglatex.ImgLatex
+	Port      uint
+	DB        *database.PostgresDriver
+	ImgLatex  *imglatex.ImgLatex
+	LLMClient inference.LLMClient
 }
 
 func (r *Router) SetConfig(config *RouterConfig) {
@@ -47,6 +49,7 @@ func (r *Router) SetConfig(config *RouterConfig) {
 	r.Config = config
 	r.S.DB = config.DB
 	r.S.ImgLatex = config.ImgLatex
+	r.S.LLMClient = config.LLMClient
 
 }
 

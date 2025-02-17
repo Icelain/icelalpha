@@ -7,7 +7,7 @@ import (
 )
 
 type LLMClient interface {
-	StreamResponse(ctx context.Context, query string) <-chan string
+	StreamResponse(ctx context.Context, query string) (<-chan string, error)
 }
 
 type ClaudeLLMClient struct {
@@ -37,6 +37,11 @@ func (c *ClaudeLLMClient) StreamResponse(ctx context.Context, query string) (<-c
 			},
 			Stream: true,
 		},
+	}
+
+	response, err := c.anthropicClient.CreateMessagesStream(ctx, request)
+	if err != nil {
+
 	}
 
 }

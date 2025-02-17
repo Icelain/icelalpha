@@ -5,6 +5,7 @@ import (
 	"icealpha/internal/database"
 	"icealpha/internal/router"
 	"icealpha/pkg/imglatex"
+	"icealpha/pkg/inference"
 	"log"
 	"os"
 )
@@ -24,9 +25,10 @@ func Execute() {
 	srv := router.NewRouter()
 	srvconfig := router.RouterConfig{
 
-		Port:     flags.HttpPort,
-		DB:       db,
-		ImgLatex: imglatex.NewImgLatex(os.Getenv("GROQ_API_KEY")),
+		Port:      flags.HttpPort,
+		DB:        db,
+		ImgLatex:  imglatex.NewImgLatex(os.Getenv("GROQ_API_KEY")),
+		LLMClient: inference.NewClaudeLLMClient(os.Getenv("CLAUDE_API_KEY")),
 	}
 
 	srv.SetConfig(&srvconfig)
