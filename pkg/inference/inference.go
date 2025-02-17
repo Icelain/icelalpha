@@ -42,6 +42,8 @@ func (c *ClaudeLLMClient) StreamResponse(ctx context.Context, query string) (<-c
 	response, err := c.anthropicClient.CreateMessagesStream(ctx, request)
 	if err != nil {
 
+		return nil, err
+
 	}
 
 }
