@@ -40,13 +40,13 @@ func HandleSolveInputImage(pattern string, rtr *router.Router) {
 
 		// latex to answer
 		// stream response
-
-		if err = json.NewEncoder(w).Encode(response); err != nil {
-
-			http.Error(w, "Error writing final response", http.StatusInternalServerError)
-			return
-
-		}
+		//
+		//		if err = json.NewEncoder(w).Encode(response); err != nil {
+		//
+		//			http.Error(w, "Error writing final response", http.StatusInternalServerError)
+		//			return
+		//
+		//		}
 
 	})
 
