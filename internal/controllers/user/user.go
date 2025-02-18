@@ -1,11 +1,15 @@
 package user
 
 import (
+	"context"
 	"encoding/json"
+	"fmt"
 	"icealpha/internal/router"
 
 	"net/http"
 )
+
+const QUERYBOILERPLATE = "Give the result of the following problem: %s\n Give the result in the first line and the explanation in the following lines"
 
 // POST(problem: multipart[image]) -> Json(content: string)
 func HandleSolveInputImage(pattern string, rtr *router.Router) {
@@ -39,13 +43,14 @@ func HandleSolveInputImage(pattern string, rtr *router.Router) {
 
 		}
 
-		// latex to answer
-		// stream response
-		//
-		//		if err = json.NewEncoder(w).Encode(response); err != nil {
-		//
-		//			http.Error(w, "Error writing final response", http.StatusInternalServerError)
-		//			return
+		responseChannel, err := rtr.S.LLMClient.StreamResponse(context.Background(), fmt.Sprintf(QUERYBOILERPLATE, latex))
+		if err != nil {
+
+			http.Error(w, "Could not think at the moment. Try again later")
+			return
+		}
+
+		//		for msg := range responseChannel {
 		//
 		//		}
 
