@@ -7,6 +7,7 @@ import (
 	"net/http"
 )
 
+// POST(problem: multipart[image]) -> Json(content: string)
 func HandleSolveInputImage(pattern string, rtr *router.Router) {
 
 	rtr.R.Post(pattern, func(w http.ResponseWriter, r *http.Request) {
