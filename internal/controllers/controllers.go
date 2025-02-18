@@ -27,6 +27,7 @@ func HandleAll(r *router.Router) {
 
 }
 
+// GET :: -> Json(status: string)
 func HandleAPIIndex(pattern string, rtr *router.Router) {
 
 	rtr.R.Get(pattern, func(w http.ResponseWriter, r *http.Request) {
@@ -45,6 +46,7 @@ func HandleAPIIndex(pattern string, rtr *router.Router) {
 
 }
 
+// GET :: -> Redirect(url)
 func HandleOAuthFlow(pattern string, rtr *router.Router) {
 
 	rtr.R.Get(pattern, func(w http.ResponseWriter, r *http.Request) {
@@ -72,6 +74,7 @@ func HandleOAuthFlow(pattern string, rtr *router.Router) {
 
 }
 
+// GET :: -> SessionCookie | Redirect
 func HandleOAuthCallback(pattern string, rtr *router.Router) {
 
 	rtr.R.Get(pattern, func(w http.ResponseWriter, r *http.Request) {
