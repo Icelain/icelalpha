@@ -46,13 +46,36 @@ func HandleSolveInputImage(pattern string, rtr *router.Router) {
 		responseChannel, err := rtr.S.LLMClient.StreamResponse(context.Background(), fmt.Sprintf(QUERYBOILERPLATE, latex))
 		if err != nil {
 
-			http.Error(w, "Could not think at the moment. Try again later")
+			http.Error(w, "Could not think at the moment. Try again later", http.StatusInternalServerError)
 			return
 		}
 
-		//		for msg := range responseChannel {
-		//
-		//		}
+		flusher, ok := w.(http.Flusher)
+		if !ok {
+
+			http.Error(w, "Could not create a streaming response", http.StatusInternalServerError)
+			return
+
+		}
+
+		responseStruct := struct {
+			Token string `json:"token"`
+		}{}
+
+		for llmResponseToken := range responseChannel {
+
+			responseStruct.Token = llmResponseToken
+
+			if err := json.NewEncoder(w).Encode(&responseStruct); err != nil {
+
+				http.Error(w, "error while streaming response", http.StatusInternalServerError)
+				return
+
+			}
+
+			flusher.Flush()
+
+		}
 
 	})
 
@@ -76,7 +99,39 @@ func HandleSolveTextInput(pattern string, rtr *router.Router) {
 
 		}
 
-		// convert queryStruct.Query to the result
+		responseChannel, err := rtr.S.LLMClient.StreamResponse(context.Background(), fmt.Sprintf(QUERYBOILERPLATE, queryStruct.Query))
+		if err != nil {
+
+			http.Error(w, "Could not think at the moment. Try again later", http.StatusInternalServerError)
+			return
+		}
+
+		flusher, ok := w.(http.Flusher)
+		if !ok {
+
+			http.Error(w, "Could not create a streaming response", http.StatusInternalServerError)
+			return
+
+		}
+
+		responseStruct := struct {
+			Token string `json:"token"`
+		}{}
+
+		for llmResponseToken := range responseChannel {
+
+			responseStruct.Token = llmResponseToken
+
+			if err := json.NewEncoder(w).Encode(&responseStruct); err != nil {
+
+				http.Error(w, "error while streaming response", http.StatusInternalServerError)
+				return
+
+			}
+
+			flusher.Flush()
+
+		}
 
 	})
 

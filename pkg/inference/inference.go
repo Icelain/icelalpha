@@ -9,7 +9,7 @@ import (
 )
 
 type LLMClient interface {
-	StreamResponse(ctx context.Context, query string) (<-chan string, error)
+	StreamResponse(ctx context.Context, query string) (chan string, error)
 }
 
 type ClaudeLLMClient struct {
@@ -66,6 +66,8 @@ func (cl *ClaudeLLMClient) StreamResponse(ctx context.Context, query string) (ch
 	return resultChan, nil
 
 }
+
+// ollama based llm client works on local models
 
 type OllamaLLMClient struct {
 	ollamaclient *ollama.Client
