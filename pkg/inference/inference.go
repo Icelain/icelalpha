@@ -5,6 +5,7 @@ import (
 
 	anthropic "github.com/anthropics/anthropic-sdk-go"
 	"github.com/anthropics/anthropic-sdk-go/option"
+	ollama "github.com/ollama/ollama/api"
 )
 
 type LLMClient interface {
@@ -58,8 +59,52 @@ func (cl *ClaudeLLMClient) StreamResponse(ctx context.Context, query string) (ch
 			}
 		}
 
+		close(resultChan)
+
 	}()
 
 	return resultChan, nil
+
+}
+
+type OllamaLLMClient struct {
+	ollamaclient *ollama.Client
+	model        string
+}
+
+func (dl *OllamaLLMClient) StreamResponse(ctx context.Context, query string) (chan string, error) {
+
+	to := make(chan string)
+	request := &ollama.GenerateRequest{
+
+		Model:  dl.model,
+		Prompt: query,
+	}
+
+	go func() {
+		dl.ollamaclient.Generate(ctx, request, func(generatedResponse ollama.GenerateResponse) error {
+
+			to <- generatedResponse.Response
+			return nil
+
+		})
+
+		close(to)
+	}()
+
+	return to, nil
+
+}
+
+func NewOllamaLLMClient(ctx context.Context, model string) (*OllamaLLMClient, error) {
+
+	client, err := ollama.ClientFromEnvironment()
+	if err != nil {
+
+		return &OllamaLLMClient{}, nil
+
+	}
+
+	return &OllamaLLMClient{ollamaclient: client, model: model}, nil
 
 }
