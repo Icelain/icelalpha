@@ -2,10 +2,15 @@ package inference
 
 import (
 	"context"
+	"errors"
+	"io"
 
 	anthropic "github.com/anthropics/anthropic-sdk-go"
 	"github.com/anthropics/anthropic-sdk-go/option"
 	ollama "github.com/ollama/ollama/api"
+
+	deepseek "github.com/cohesion-org/deepseek-go"
+	deepseekconstants "github.com/cohesion-org/deepseek-go/constants"
 )
 
 type LLMClient interface {
@@ -108,5 +113,54 @@ func NewOllamaLLMClient(ctx context.Context, model string) (*OllamaLLMClient, er
 	}
 
 	return &OllamaLLMClient{ollamaclient: client, model: model}, nil
+
+}
+
+// deepseek api based llm client
+
+type DeepSeekLLMClient struct {
+	deepseekClient *deepseek.Client
+}
+
+func NewDeepSeekLLMClient(apiKey string) *DeepSeekLLMClient {
+
+	return &DeepSeekLLMClient{deepseekClient: deepseek.NewClient(apiKey)}
+
+}
+
+func (ds *DeepSeekLLMClient) StreamResponse(ctx context.Context, query string) (chan string, error) {
+
+	request := &deepseek.StreamChatCompletionRequest{
+		Model: deepseek.DeepSeekChat,
+		Messages: []deepseek.ChatCompletionMessage{
+			{Role: deepseekconstants.ChatMessageRoleUser, Content: "Just testing if the streaming feature is working or not!"},
+		},
+		Stream: true,
+	}
+	stream, err := ds.deepseekClient.CreateChatCompletionStream(ctx, request)
+	if err != nil {
+		return nil, err
+	}
+
+	responseChannel := make(chan string)
+
+	go func() {
+
+		defer stream.Close()
+		for {
+			response, err := stream.Recv()
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			for _, choice := range response.Choices {
+
+				responseChannel <- choice.Delta.Content
+
+			}
+		}
+
+	}()
+
+	return responseChannel, nil
 
 }
