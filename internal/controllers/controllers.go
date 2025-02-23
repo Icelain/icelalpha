@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"icealpha/internal/controllers/auth"
+	"icealpha/internal/controllers/user"
 	"icealpha/internal/router"
 	"log/slog"
 	"net/http"
@@ -24,6 +25,9 @@ func HandleAll(r *router.Router) {
 	HandleAPIIndex("/api", r)
 	HandleOAuthFlow("/api/oauth", r)
 	HandleOAuthCallback("/api/oauth/{provider}/callback", r)
+
+	user.HandleSolveInputImage("/api/user/handleimage", r)
+	user.HandleSolveTextInput("/api/user/handletext", r)
 
 }
 

@@ -34,3 +34,8 @@ func TestOllamaDeepseekStreamResponse(t *testing.T) {
 	}
 
 }
+
+func TestDeepSeekAPIStreamResponse(t *testing.T) {
+
+	// implement later
+}
