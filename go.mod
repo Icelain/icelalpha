@@ -6,6 +6,7 @@ require (
 	github.com/anthropics/anthropic-sdk-go v0.2.0-alpha.10
 	github.com/cohesion-org/deepseek-go v1.2.3
 	github.com/go-chi/chi/v5 v5.2.0
+	github.com/google/uuid v1.6.0
 	github.com/gorilla/sessions v1.4.0
 	github.com/jackc/pgx/v5 v5.7.2
 	github.com/joho/godotenv v1.5.1
