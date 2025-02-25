@@ -6,37 +6,37 @@ import (
 	"fmt"
 	"icealpha/internal/router"
 
-	"net/http"
-	"io"
 	"bytes"
+	"io"
+	"net/http"
 )
 
 const QUERYBOILERPLATE = "Give the result of the following problem: %s\n Give the result in the first line and the explanation in the following lines"
-const ValidImageTypes := map[string]bool{
-        "image/jpeg": true,
-        "image/jpg":  true,
-        "image/png":  true,
-        "image/gif":  true,
-        "image/webp": true,
-    }
 
 func validateImageFile(r *http.Request) (bool, error) {
-    // Read first 512 bytes to determine the content type
-    buffer := make([]byte, 512)
-    _, err := r.Body.Read(buffer)
-    if err != nil && err != io.EOF {
-        return false, err
-    }
+	// Read first 512 bytes to determine the content type
+	buffer := make([]byte, 512)
+	_, err := r.Body.Read(buffer)
+	if err != nil && err != io.EOF {
+		return false, err
+	}
 
-    // Reset the body to be read again
-    r.Body = io.NopCloser(bytes.NewBuffer(append(buffer, make([]byte, 0)...)))
+	// Reset the body to be read again
+	r.Body = io.NopCloser(bytes.NewBuffer(append(buffer, make([]byte, 0)...)))
 
-    // Check the content type
-    contentType := http.DetectContentType(buffer)
-    
-    // List of allowed image MIME types
+	// Check the content type
+	contentType := http.DetectContentType(buffer)
 
-    return ValidImageTypes[contentType], nil
+	validImageTypes := map[string]bool{
+		"image/jpeg": true,
+		"image/jpg":  true,
+		"image/png":  true,
+		"image/gif":  true,
+		"image/webp": true,
+	}
+	// List of allowed image MIME types
+
+	return validImageTypes[contentType], nil
 }
 
 // POST(problem: multipart[image]) -> Json(content: string)
@@ -53,13 +53,13 @@ func HandleSolveInputImage(pattern string, rtr *router.Router) {
 
 		}
 
-		if err; ok := validateImageFile(r); err != nil || !ok {
+		if ok, err := validateImageFile(r); err != nil || !ok {
 
 			http.Error(w, "invalid image file", http.StatusBadRequest)
 			return
-			
+
 		}
-		
+
 		file, err := multiPartFile.Open()
 		if err != nil {
 
@@ -169,3 +169,9 @@ func HandleSolveTextInput(pattern string, rtr *router.Router) {
 	})
 
 }
+
+func AuthMiddleWare(handlerFunc func(http.ResponseWriter, *http.Request)){
+
+	
+	
+})

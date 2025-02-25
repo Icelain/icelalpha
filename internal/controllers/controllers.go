@@ -28,7 +28,6 @@ func HandleAll(r *router.Router) {
 
 	user.HandleSolveInputImage("/api/user/handleimage", r)
 	user.HandleSolveTextInput("/api/user/handletext", r)
-
 }
 
 // GET :: -> Json(status: string)
