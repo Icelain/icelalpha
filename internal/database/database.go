@@ -2,8 +2,11 @@ package database
 
 import (
 	"context"
+	"icealpha/internal/types"
 
+	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
 type PostgresDriver struct {
@@ -44,6 +47,31 @@ func (pd *PostgresDriver) CheckUserExists(ctx context.Context, email string) boo
 
 }
 
+func (pd *PostgresDriver) GetUser(ctx context.Context, email string) (types.User, error) {
+
+	result := types.User{}
+	res, err := pd.conn.Query(ctx, "SELECT (uuid, username, email) FROM usersrecord WHERE email=$1", email)
+
+	if err != nil {
+
+		return types.User{}, err
+
+	}
+
+	pgxUuid := pgtype.UUID{}
+	res.Scan(&pgxUuid, &result.Username, &result.Email)
+	result.UUID, err = uuid.FromBytes(pgxUuid.Bytes[:])
+
+	if err != nil {
+
+		return types.User{}, err
+
+	}
+
+	return result, nil
+
+}
+
 func (pd *PostgresDriver) InsertUser(ctx context.Context, username string, email string) error {
 
 	_, err := pd.conn.Exec(ctx, "INSERT INTO usersrecord(username, email) VALUES ($1, $2)", username, email)
@@ -55,7 +83,6 @@ func (pd *PostgresDriver) RemoveUser(ctx context.Context, email string) error {
 
 	_, err := pd.conn.Exec(ctx, "DELETE FROM usersrecord WHERE email=$1", email)
 	return err
-
 }
 
 func (pd *PostgresDriver) UpdateUsername(ctx context.Context, email string, newUsername string) error {
