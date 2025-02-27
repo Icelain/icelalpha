@@ -11,7 +11,7 @@ import (
 	"net/http"
 )
 
-const QUERYBOILERPLATE = "Give the result of the following problem: %s\n Give the result in the first line and the explanation in the following lines"
+const QueryBoilerplate = "Give the result of the following problem: %s\n Give the result in the first line and the explanation in the following lines"
 
 func validateImageFile(r *http.Request) (bool, error) {
 	// Read first 512 bytes to determine the content type
@@ -76,7 +76,7 @@ func HandleSolveInputImage(pattern string, rtr *router.Router) {
 
 		}
 
-		responseChannel, err := rtr.S.LLMClient.StreamResponse(context.Background(), fmt.Sprintf(QUERYBOILERPLATE, latex))
+		responseChannel, err := rtr.S.LLMClient.StreamResponse(context.Background(), fmt.Sprintf(QueryBoilerplate, latex))
 		if err != nil {
 
 			http.Error(w, "Could not think at the moment. Try again later", http.StatusInternalServerError)
@@ -132,7 +132,7 @@ func HandleSolveTextInput(pattern string, rtr *router.Router) {
 
 		}
 
-		responseChannel, err := rtr.S.LLMClient.StreamResponse(context.Background(), fmt.Sprintf(QUERYBOILERPLATE, queryStruct.Query))
+		responseChannel, err := rtr.S.LLMClient.StreamResponse(context.Background(), fmt.Sprintf(QueryBoilerplate, queryStruct.Query))
 		if err != nil {
 
 			http.Error(w, "Could not think at the moment. Try again later", http.StatusInternalServerError)
@@ -170,8 +170,4 @@ func HandleSolveTextInput(pattern string, rtr *router.Router) {
 
 }
 
-func AuthMiddleWare(handlerFunc func(http.ResponseWriter, *http.Request)){
-
-	
-	
-})
+func AuthMiddleWare(handlerFunc func(http.ResponseWriter, *http.Request)) {}
