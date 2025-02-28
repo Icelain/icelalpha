@@ -106,6 +106,7 @@ func HandleSolveInputImage(pattern string, rtr *router.Router) {
 
 			}
 
+			// flush changes to the stream
 			flusher.Flush()
 
 		}
