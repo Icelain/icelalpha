@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"icealpha/internal/controllers/auth"
 	"icealpha/internal/router"
 
 	"bytes"
@@ -166,6 +167,22 @@ func HandleSolveTextInput(rtr *router.Router) http.HandlerFunc {
 			flusher.Flush()
 
 		}
+
+	}
+
+}
+
+func AuthMiddleware(next http.HandlerFunc, rtr *router.Router) http.HandlerFunc {
+
+	return func(w http.ResponseWriter, r *http.Request) {
+
+		if !auth.CheckSessionExists(r, rtr.S.CookieStore) {
+
+			http.Redirect(w, r, "/api", http.StatusTemporaryRedirect)
+			return
+
+		}
+		next.ServeHTTP(w, r)
 
 	}
 
