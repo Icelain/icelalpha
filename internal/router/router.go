@@ -38,6 +38,7 @@ func NewRouter() *Router {
 
 }
 
+// Configuration struct for Router
 type RouterConfig struct {
 	Port      uint
 	DB        *database.PostgresDriver
