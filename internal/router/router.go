@@ -13,6 +13,7 @@ import (
 	"github.com/go-chi/chi/v5"
 )
 
+// Router maintains state, logic and logging in one place
 type Router struct {
 	R      *chi.Mux
 	Logger *slog.Logger
