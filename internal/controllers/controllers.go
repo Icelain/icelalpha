@@ -14,6 +14,7 @@ import (
 	"golang.org/x/oauth2"
 )
 
+// Start all controllers and configure cookie store
 func HandleAll(r *router.Router) {
 
 	// set oauth2 config
