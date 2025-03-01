@@ -40,9 +40,9 @@ func validateImageFile(r *http.Request) (bool, error) {
 }
 
 // POST(problem: multipart[image]) -> Json(content: string)
-func HandleSolveInputImage(pattern string, rtr *router.Router) {
+func HandleSolveInputImage(rtr *router.Router) http.HandlerFunc {
 
-	rtr.R.Post(pattern, func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
 
 		multiPartFile := r.MultipartForm.File["problem"][0]
 
@@ -111,14 +111,14 @@ func HandleSolveInputImage(pattern string, rtr *router.Router) {
 
 		}
 
-	})
+	}
 
 }
 
 // POST :: Json(query: string) -> Json(content: string)
-func HandleSolveTextInput(pattern string, rtr *router.Router) {
+func HandleSolveTextInput(rtr *router.Router) http.HandlerFunc {
 
-	rtr.R.Post(pattern, func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
 
 		defer r.Body.Close()
 
@@ -167,8 +167,6 @@ func HandleSolveTextInput(pattern string, rtr *router.Router) {
 
 		}
 
-	})
+	}
 
 }
-
-func AuthMiddleWare(handlerFunc func(http.ResponseWriter, *http.Request)) {}
