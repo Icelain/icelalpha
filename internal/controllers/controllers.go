@@ -23,18 +23,17 @@ func HandleAll(r *router.Router) {
 	// set cookiestore
 	r.S.CookieStore = sessions.NewCookieStore([]byte("SESSION_KEY"))
 
-	HandleAPIIndex("/api", r)
-	HandleOAuthFlow("/api/oauth", r)
-	HandleOAuthCallback("/api/oauth/{provider}/callback", r)
-
-	user.HandleSolveInputImage("/api/user/handleimage", r)
-	user.HandleSolveTextInput("/api/user/handletext", r)
+	r.R.Get("/api", HandleAPIIndex(r))
+	r.R.Get("/api/oauth", HandleOAuthFlow(r))
+	r.R.Get("/api/oauth/{provider}/callback", HandleOAuthCallback(r))
+	r.R.Post("/api/user/handleimage", user.HandleSolveInputImage(r))
+	r.R.Post("/api/user/handletext", user.HandleSolveTextInput(r))
 }
 
 // GET :: -> Json(status: string)
-func HandleAPIIndex(pattern string, rtr *router.Router) {
+func HandleAPIIndex(rtr *router.Router) http.HandlerFunc {
 
-	rtr.R.Get(pattern, func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
 
 		if err := json.NewEncoder(w).Encode(map[string]string{
 
@@ -46,14 +45,14 @@ func HandleAPIIndex(pattern string, rtr *router.Router) {
 
 		}
 
-	})
+	}
 
 }
 
 // GET :: -> Redirect(url)
-func HandleOAuthFlow(pattern string, rtr *router.Router) {
+func HandleOAuthFlow(rtr *router.Router) http.HandlerFunc {
 
-	rtr.R.Get(pattern, func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
 
 		provider := r.URL.Query().Get("provider")
 
@@ -74,14 +73,14 @@ func HandleOAuthFlow(pattern string, rtr *router.Router) {
 
 		}
 
-	})
+	}
 
 }
 
 // GET :: -> SessionCookie | Redirect
-func HandleOAuthCallback(pattern string, rtr *router.Router) {
+func HandleOAuthCallback(rtr *router.Router) http.HandlerFunc {
 
-	rtr.R.Get(pattern, func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
 
 		provider := r.PathValue("provider")
 
@@ -143,6 +142,6 @@ func HandleOAuthCallback(pattern string, rtr *router.Router) {
 
 		}
 
-	})
+	}
 
 }
