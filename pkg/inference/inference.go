@@ -28,6 +28,7 @@ func NewClaudeLLMClient(apiKey string) *ClaudeLLMClient {
 
 }
 
+// stream response to client, pass in context to manage stream cancellation
 func (cl *ClaudeLLMClient) StreamResponse(ctx context.Context, query string) (chan string, error) {
 
 	stream := cl.anthropicClient.Messages.NewStreaming(context.TODO(), anthropic.MessageNewParams{
