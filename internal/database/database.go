@@ -9,6 +9,8 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
+// Db interface will be mocked once initial release is done
+
 type PostgresDriver struct {
 	conn *pgx.Conn
 }
