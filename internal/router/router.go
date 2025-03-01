@@ -21,6 +21,7 @@ type Router struct {
 	Config *RouterConfig
 }
 
+// Create a new empty Router
 func NewRouter() *Router {
 
 	router := &Router{}
@@ -54,7 +55,6 @@ func (r *Router) SetConfig(config *RouterConfig) {
 	r.S.LLMClient = config.LLMClient
 
 }
-
 func (r *Router) Serve() error {
 
 	r.Logger.Info(fmt.Sprintf("Server running on port :%d", r.Config.Port))
