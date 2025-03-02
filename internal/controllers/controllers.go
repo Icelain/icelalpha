@@ -100,16 +100,16 @@ func HandleOAuthCallback(rtr *router.Router) http.HandlerFunc {
 					return
 				}
 
-				if rtr.S.DB.CheckUserExists(context.Background(), githubUser.Email) {
+				if !rtr.S.DB.CheckUserExists(context.Background(), githubUser.Email) {
 
-					http.Redirect(w, r, redirectPath, http.StatusTemporaryRedirect)
-					return
+					if err := rtr.S.DB.InsertUser(context.Background(), githubUser.Username, githubUser.Email); err != nil {
 
-				}
+						http.Error(w, "error creating user", http.StatusInternalServerError)
+						return
 
-				if err := rtr.S.DB.InsertUser(context.Background(), githubUser.Username, githubUser.Email); err != nil {
+					}
 
-					http.Error(w, "error creating user", http.StatusInternalServerError)
+					http.Redirect(w, r, "/api", http.StatusTemporaryRedirect)
 					return
 
 				}
