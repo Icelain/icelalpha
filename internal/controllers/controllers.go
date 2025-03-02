@@ -114,8 +114,22 @@ func HandleOAuthCallback(rtr *router.Router) http.HandlerFunc {
 
 				}
 
-				// create a user session cookie
+				_, ok := rtr.S.CreditCache.Load(githubUser.Email)
+				if !ok {
 
+					user, err := rtr.S.DB.GetUser(context.Background(), githubUser.Email)
+					if err != nil {
+
+						http.Error(w, "internal error occurred", http.StatusInternalServerError)
+						return
+
+					}
+
+					rtr.S.CreditCache.Store(githubUser.Email, user.CreditBalance)
+
+				}
+
+				// create a user session cookie
 				session, err := rtr.S.CookieStore.Get(r, "usersession")
 				if err != nil {
 
