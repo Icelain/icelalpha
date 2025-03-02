@@ -93,3 +93,10 @@ func (pd *PostgresDriver) UpdateUsername(ctx context.Context, email string, newU
 	return err
 
 }
+
+func (pd *PostgresDriver) UpdateUserCredits(ctx context.Context, email string) error {
+
+	_, err := pd.conn.Exec(ctx, "UPDATE usersrecord SET credits=credits-1 WHERE email=$1", email)
+	return err
+
+}
