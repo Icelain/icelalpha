@@ -26,8 +26,8 @@ func HandleAll(r *router.Router) {
 	r.R.Get("/api", HandleAPIIndex(r))
 	r.R.Get("/api/oauth", HandleOAuthFlow(r))
 	r.R.Get("/api/oauth/{provider}/callback", HandleOAuthCallback(r))
-	r.R.Post("/api/user/handleimage", user.HandleSolveInputImage(r))
-	r.R.Post("/api/user/handletext", user.HandleSolveTextInput(r))
+	r.R.Post("/api/user/handleimage", user.AuthMiddleware(user.HandleSolveInputImage(r), r))
+	r.R.Post("/api/user/handletext", user.AuthMiddleware(user.HandleSolveTextInput(r), r))
 }
 
 // GET :: -> Json(status: string)
