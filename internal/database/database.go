@@ -21,6 +21,7 @@ func (pd *PostgresDriver) Close(ctx context.Context) error {
 
 }
 
+// Connect to postgres instance
 func CreatePostgresDriver(connectionURL string) (*PostgresDriver, error) {
 
 	conn, err := pgx.Connect(context.Background(), connectionURL)
@@ -49,6 +50,7 @@ func (pd *PostgresDriver) CheckUserExists(ctx context.Context, email string) boo
 
 }
 
+// Get user from email[email is currently a unique identifier]
 func (pd *PostgresDriver) GetUser(ctx context.Context, email string) (types.User, error) {
 
 	result := types.User{}
@@ -94,6 +96,7 @@ func (pd *PostgresDriver) UpdateUsername(ctx context.Context, email string, newU
 
 }
 
+// directly update user credits
 func (pd *PostgresDriver) UpdateUserCredits(ctx context.Context, email string) error {
 
 	_, err := pd.conn.Exec(ctx, "UPDATE usersrecord SET credits=credits-20 WHERE email=$1", email)
