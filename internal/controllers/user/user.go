@@ -172,7 +172,7 @@ func HandleSolveTextInput(rtr *router.Router) http.HandlerFunc {
 
 }
 
-// user authentication middleware
+// user authentication middleware, only checks session for now
 func AuthMiddleware(next http.HandlerFunc, rtr *router.Router) http.HandlerFunc {
 
 	return func(w http.ResponseWriter, r *http.Request) {
