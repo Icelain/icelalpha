@@ -112,6 +112,8 @@ func HandleSolveInputImage(rtr *router.Router) http.HandlerFunc {
 
 		}
 
+		// load and decrement creditcache by 1
+
 	}
 
 }
