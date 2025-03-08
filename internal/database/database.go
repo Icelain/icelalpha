@@ -108,3 +108,10 @@ SET credits = CASE
 	return err
 
 }
+
+func (pd *PostgresDriver) NullifyUserCredits(ctx context.Context, email string) error {
+
+	_, err := pd.conn.Exec(ctx, "UPDATE usersrecord SET credits=0 where email=$1", email)
+	return err
+
+}
