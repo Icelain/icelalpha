@@ -97,7 +97,7 @@ func HandleOAuthCallback(rtr *router.Router) http.HandlerFunc {
 				githubUser, redirectPath, err = auth.HandleGithubOAuthCallback(rtr, auth.GithubOAuthConfig, w, r)
 				if err != nil {
 					rtr.Logger.Error("err handling github oauth callback", "err", err)
-					http.Redirect(w, r, "/login", http.StatusSeeOther)
+					//http.Redirect(w, r, "/login", http.StatusSeeOther)
 					return
 				}
 
