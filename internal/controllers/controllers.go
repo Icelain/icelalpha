@@ -171,6 +171,7 @@ func HandleOAuthLogout(rtr *router.Router) http.HandlerFunc {
 
 		}
 
+		// clear out previous session
 		session.Values = map[interface{}]interface{}{}
 
 	}
