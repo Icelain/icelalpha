@@ -3,11 +3,36 @@ package database
 import (
 	"context"
 	"icealpha/internal/types"
+	"io/fs"
+	"os"
+	"path/filepath"
 
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgtype"
 )
+
+const MIGRATIONDIR = "./migrations"
+
+func tryMigrate(connection *pgx.Conn) error {
+
+	filepath.Walk(MIGRATIONDIR, func(fp string, info fs.FileInfo, err error) error {
+
+		fileContent, err := os.ReadFile(filepath.Join(MIGRATIONDIR, fp))
+		if err != nil {
+			return err
+		}
+		_, err = connection.Exec(context.Background(), string(fileContent))
+
+		if err != nil {
+			return err
+		}
+
+		return nil
+	})
+	return nil
+
+}
 
 // Db interface will be mocked once initial release is done
 
@@ -26,6 +51,10 @@ func CreatePostgresDriver(connectionURL string) (*PostgresDriver, error) {
 
 	conn, err := pgx.Connect(context.Background(), connectionURL)
 	if err != nil {
+		return &PostgresDriver{}, err
+	}
+
+	if err = tryMigrate(conn); err != nil {
 		return &PostgresDriver{}, err
 	}
 
