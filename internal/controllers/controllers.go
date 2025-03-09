@@ -159,3 +159,20 @@ func HandleOAuthCallback(rtr *router.Router) http.HandlerFunc {
 	}
 
 }
+
+func HandleOAuthLogout(rtr *router.Router) http.HandlerFunc {
+
+	return func(w http.ResponseWriter, r *http.Request) {
+
+		session, err := rtr.S.CookieStore.Get(r, "usersession")
+		if err != nil {
+
+			return
+
+		}
+
+		session.Values = map[interface{}]interface{}{}
+
+	}
+
+}
