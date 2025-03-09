@@ -66,6 +66,16 @@ func HandleSolveInputImage(rtr *router.Router) http.HandlerFunc {
 
 		}
 
+		creditsUint64 := credits.(uint64)
+
+		// handle case where the user has no credits
+		if creditsUint64 == 0 {
+
+			http.Error(w, "user has no credits left", http.StatusBadRequest)
+			return
+
+		}
+
 		multiPartFile := r.MultipartForm.File["problem"][0]
 
 		if multiPartFile.Size > (1024 * 1024 * 20) { // 20 mb
@@ -133,7 +143,7 @@ func HandleSolveInputImage(rtr *router.Router) http.HandlerFunc {
 
 		}
 
-		rtr.S.CreditCache.Store(userEmail, credits-1)
+		rtr.S.CreditCache.Store(userEmail, creditsUint64-1)
 
 	}
 
@@ -144,6 +154,36 @@ func HandleSolveTextInput(rtr *router.Router) http.HandlerFunc {
 
 	return func(w http.ResponseWriter, r *http.Request) {
 
+		userSession, err := rtr.S.CookieStore.Get(
+			r, "usersession",
+		)
+
+		if err != nil {
+
+			http.Error(w, "User session expired", http.StatusBadRequest)
+			return
+
+		}
+
+		userEmail := userSession.Values["email"].(string)
+
+		credits, ok := rtr.S.CreditCache.Load(userEmail)
+		if !ok {
+
+			http.Error(w, "internal server error occureed", http.StatusInternalServerError)
+			return
+
+		}
+
+		creditsUint64 := credits.(uint64)
+
+		// handle case where the user has no credits
+		if creditsUint64 == 0 {
+
+			http.Error(w, "user has no credits left", http.StatusBadRequest)
+			return
+
+		}
 		defer r.Body.Close()
 
 		queryStruct := struct {
@@ -190,6 +230,8 @@ func HandleSolveTextInput(rtr *router.Router) http.HandlerFunc {
 			flusher.Flush()
 
 		}
+
+		rtr.S.CreditCache.Store(userEmail, creditsUint64-1)
 
 	}
 
