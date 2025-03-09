@@ -54,6 +54,7 @@ func CreatePostgresDriver(connectionURL string) (*PostgresDriver, error) {
 		return &PostgresDriver{}, err
 	}
 
+	// Attempt to migrate on creation of interface driver
 	if err = tryMigrate(conn); err != nil {
 		return &PostgresDriver{}, err
 	}
