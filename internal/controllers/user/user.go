@@ -231,6 +231,7 @@ func HandleSolveTextInput(rtr *router.Router) http.HandlerFunc {
 
 		}
 
+		// reduce credits for user
 		rtr.S.CreditCache.Store(userEmail, creditsUint64-1)
 
 	}
