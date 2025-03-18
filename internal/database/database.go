@@ -14,6 +14,7 @@ import (
 
 const MIGRATIONDIR = "./migrations"
 
+// Try migrating if a new db is connected
 func tryMigrate(connection *pgx.Conn) error {
 
 	filepath.Walk(MIGRATIONDIR, func(fp string, info fs.FileInfo, err error) error {
