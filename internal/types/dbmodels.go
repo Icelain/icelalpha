@@ -6,6 +6,8 @@ import (
 
 // Icealpha user schema
 type User struct {
+
+	// use uuid as primary key and main identity
 	UUID     uuid.UUID
 	Email    string
 	Username string
