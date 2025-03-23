@@ -127,6 +127,7 @@ func HandleSolveInputImage(rtr *router.Router) http.HandlerFunc {
 			Token string `json:"token"`
 		}{}
 
+		// stream llm response tokens to http writer
 		for llmResponseToken := range responseChannel {
 
 			responseStruct.Token = llmResponseToken
