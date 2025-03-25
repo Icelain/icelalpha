@@ -22,7 +22,7 @@ func Execute() {
 
 	}
 
-	log.Println("Established connection with the database")
+	log.Println("Established a connection with the database")
 
 	srv := router.NewRouter()
 	srvconfig := router.RouterConfig{
