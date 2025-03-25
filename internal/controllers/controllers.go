@@ -105,7 +105,7 @@ func HandleOAuthCallback(rtr *router.Router) http.HandlerFunc {
 
 					if err := rtr.S.DB.InsertUser(context.Background(), githubUser.Username, githubUser.Email); err != nil {
 
-						rtr.Logger.Debug("Error creating user: ", err)
+						rtr.Logger.Info("error:" + err.Error())
 						http.Error(w, "error creating user", http.StatusInternalServerError)
 						return
 
