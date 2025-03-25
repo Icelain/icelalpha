@@ -21,7 +21,7 @@ func tryMigrate(connection *pgx.Conn) error {
 
 	filepath.Walk(MIGRATIONDIR, func(fp string, info fs.FileInfo, err error) error {
 
-		fileContent, err := os.ReadFile(filepath.Join(MIGRATIONDIR, fp))
+		fileContent, err := os.ReadFile(fp)
 		if err != nil {
 			globalErr = err
 			return err
