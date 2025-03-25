@@ -17,21 +17,25 @@ const MIGRATIONDIR = "./migrations"
 // Try migrating if a new db is connected
 func tryMigrate(connection *pgx.Conn) error {
 
+	var globalErr error
+
 	filepath.Walk(MIGRATIONDIR, func(fp string, info fs.FileInfo, err error) error {
 
 		fileContent, err := os.ReadFile(filepath.Join(MIGRATIONDIR, fp))
 		if err != nil {
+			globalErr = err
 			return err
 		}
 		_, err = connection.Exec(context.Background(), string(fileContent))
 
 		if err != nil {
-			return err
+			globalErr = err
+			return nil
 		}
 
 		return nil
 	})
-	return nil
+	return globalErr
 
 }
 
