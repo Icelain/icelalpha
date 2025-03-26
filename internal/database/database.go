@@ -2,6 +2,7 @@ package database
 
 import (
 	"context"
+	"errors"
 	"icealpha/internal/types"
 	"io/fs"
 	"os"
@@ -10,6 +11,8 @@ import (
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgtype"
+
+	"github.com/jackc/pgx/v5/pgconn"
 )
 
 const MIGRATIONDIR = "./migrations"
@@ -120,6 +123,17 @@ func (pd *PostgresDriver) GetUser(ctx context.Context, email string) (types.User
 func (pd *PostgresDriver) InsertUser(ctx context.Context, username string, email string) error {
 
 	_, err := pd.conn.Exec(ctx, "INSERT INTO usersrecord(username, email) VALUES ($1, $2)", username, email)
+
+	if err != nil {
+
+		var pgErr *pgconn.PgError
+		if ok := errors.As(err, &pgErr); ok && pgErr.Code == "23505" {
+
+			return nil
+
+		}
+	}
+
 	return err
 
 }
