@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"icealpha/internal/controllers/auth"
 	"icealpha/internal/controllers/user"
+	"icealpha/internal/database"
 	"icealpha/internal/router"
 	"log/slog"
 	"net/http"
@@ -19,6 +20,19 @@ func HandleAll(r *router.Router) {
 
 	// set oauth2 config
 	auth.SetGithubOAuthConfig()
+
+	// complete database syncing
+	go func() {
+
+		ticker := time.NewTicker(time.Minute * 5)
+
+		for range ticker.C {
+
+			database.Sync(r.S.DB, r.S.CreditCache)
+
+		}
+
+	}()
 
 	// set cookiestore
 	r.S.CookieStore = sessions.NewCookieStore([]byte("SESSION_KEY"))
