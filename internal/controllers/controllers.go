@@ -11,7 +11,6 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/gorilla/sessions"
 	"golang.org/x/oauth2"
 )
 
@@ -34,14 +33,12 @@ func HandleAll(r *router.Router) {
 
 	}()
 
-	// set cookiestore
-	r.S.CookieStore = sessions.NewCookieStore([]byte("SESSION_KEY"))
-
 	r.R.Get("/api", HandleAPIIndex(r))
 
 	r.R.Post("/api/user/handleimage", user.AuthMiddleware(user.HandleSolveInputImage(r), r))
 	r.R.Post("/api/user/handletext", user.AuthMiddleware(user.HandleSolveTextInput(r), r))
 	r.R.Post("/api/user/test", user.AuthMiddleware(user.TestController(r), r))
+	r.R.Post("/api/user/nauthtest", user.TestController(r))
 
 	r.R.Get("/api/oauth", HandleOAuthFlow(r))
 	r.R.Get("/api/oauth/logout", HandleOAuthLogout(r))
