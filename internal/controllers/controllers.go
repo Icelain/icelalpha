@@ -3,12 +3,13 @@ package controllers
 import (
 	"context"
 	"encoding/json"
-	"icealpha/internal/controllers/auth"
+	"icealpha/internal/controllers/oauth"
 	"icealpha/internal/controllers/user"
 	"icealpha/internal/database"
 	"icealpha/internal/router"
 	"log/slog"
 	"net/http"
+	"os"
 	"time"
 
 	"golang.org/x/oauth2"
@@ -17,8 +18,9 @@ import (
 // Start all controllers and configure cookie store
 func HandleAll(r *router.Router) {
 
+	var secretJWTKey = os.Getenv("SESSION_KEY")
 	// set oauth2 config
-	auth.SetGithubOAuthConfig()
+	oauth.SetGithubOAuthConfig()
 
 	// complete database syncing
 	go func() {
@@ -75,15 +77,15 @@ func HandleOAuthFlow(rtr *router.Router) http.HandlerFunc {
 
 		case "github":
 
-			if auth.CheckSessionExists(r, rtr.S.CookieStore) {
+			if oauth.CheckSessionExists(r, rtr.S.CookieStore) {
 
 				http.Redirect(w, r, "/api", http.StatusTemporaryRedirect)
 				return
 
 			}
 
-			state := auth.SetNewOAuthStateCookie(w)
-			url := auth.GithubOAuthConfig.AuthCodeURL(state, oauth2.ApprovalForce)
+			state := oauth.SetNewOAuthStateCookie(w)
+			url := oauth.GithubOAuthConfig.AuthCodeURL(state, oauth2.ApprovalForce)
 			http.Redirect(w, r, url, http.StatusTemporaryRedirect)
 
 		}
@@ -103,12 +105,12 @@ func HandleOAuthCallback(rtr *router.Router) http.HandlerFunc {
 
 		case "github":
 
-			var githubUser auth.GithubUser
+			var githubUser oauth.GithubUser
 			var redirectPath string
 			var err error
 			switch provider {
 			case "github":
-				githubUser, redirectPath, err = auth.HandleGithubOAuthCallback(rtr, auth.GithubOAuthConfig, w, r)
+				githubUser, redirectPath, err = oauth.HandleGithubOAuthCallback(rtr, oauth.GithubOAuthConfig, w, r)
 				if err != nil {
 					rtr.Logger.Error("err handling github oauth callback", "err", err)
 					//http.Redirect(w, r, "/login", http.StatusSeeOther)

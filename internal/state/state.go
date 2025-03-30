@@ -8,8 +8,9 @@ import (
 )
 
 type State struct {
-	DB          *database.PostgresDriver
-	CreditCache *sync.Map
-	ImgLatex    *imglatex.ImgLatex
-	LLMClient   inference.LLMClient
+	JwtSecretkey string
+	DB           *database.PostgresDriver
+	CreditCache  *sync.Map
+	ImgLatex     *imglatex.ImgLatex
+	LLMClient    inference.LLMClient
 }
