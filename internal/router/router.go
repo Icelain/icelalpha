@@ -2,6 +2,7 @@ package router
 
 import (
 	"fmt"
+	"icealpha/internal/controllers/jwtauth"
 	"icealpha/internal/database"
 	"icealpha/internal/state"
 	"icealpha/pkg/imglatex"
@@ -41,10 +42,11 @@ func NewRouter() *Router {
 
 // Configuration struct for Router
 type RouterConfig struct {
-	Port      uint
-	DB        *database.PostgresDriver
-	ImgLatex  *imglatex.ImgLatex
-	LLMClient inference.LLMClient
+	Port       uint
+	DB         *database.PostgresDriver
+	ImgLatex   *imglatex.ImgLatex
+	LLMClient  inference.LLMClient
+	JWTSession *jwtauth.JWTSession
 }
 
 func (r *Router) SetConfig(config *RouterConfig) {
@@ -53,6 +55,7 @@ func (r *Router) SetConfig(config *RouterConfig) {
 	r.S.DB = config.DB
 	r.S.ImgLatex = config.ImgLatex
 	r.S.LLMClient = config.LLMClient
+	r.S.JwtSession = config.JWTSession
 
 }
 func (r *Router) Serve() error {
