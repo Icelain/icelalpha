@@ -12,7 +12,6 @@ import (
 	"os"
 	"time"
 
-	"github.com/gorilla/sessions"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/github"
 )
