@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"icealpha/internal/controllers/auth"
 	"icealpha/internal/controllers/jwtauth"
 	"icealpha/internal/router"
 
@@ -64,18 +63,7 @@ func HandleSolveInputImage(rtr *router.Router) http.HandlerFunc {
 
 	return func(w http.ResponseWriter, r *http.Request) {
 
-		userSession, err := rtr.S.CookieStore.Get(
-			r, "usersession",
-		)
-
-		if err != nil {
-
-			http.Error(w, "User session expired", http.StatusBadRequest)
-			return
-
-		}
-
-		userEmail := userSession.Values["email"].(string)
+		userEmail := r.Context().Value("userEmail").(string)
 
 		credits, ok := rtr.S.CreditCache.Load(userEmail)
 		if !ok {
