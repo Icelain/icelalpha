@@ -82,12 +82,7 @@ func CreatePostgresDriver(connectionURL string) (*PostgresDriver, error) {
 
 func (pd *PostgresDriver) CheckUserExists(ctx context.Context, email string) bool {
 
-	res, err := pd.conn.Query(ctx, "SELECT EXISTS(SELECT 1 FROM usersrecord WHERE email=$1)", email)
-
-	if err != nil {
-		println(err.Error())
-		return false
-	}
+	res := pd.conn.QueryRow(ctx, "SELECT EXISTS(SELECT * FROM usersrecord WHERE email=$1);", email)
 
 	var exists bool
 	res.Scan(&exists)
