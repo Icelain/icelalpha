@@ -1,9 +1,20 @@
 package jwtauth
 
 import (
+	"fmt"
 	"github.com/golang-jwt/jwt/v5"
 	"time"
 )
+
+type JWTSession struct {
+	SecretKey string
+}
+
+func NewJWTSession(secretKey string) *JWTSession {
+
+	return &JWTSession{SecretKey: secretKey}
+
+}
 
 func CreateJWTToken(email string, secretKey string) (string, error) {
 	// Create a new JWT token with claims
@@ -20,4 +31,24 @@ func CreateJWTToken(email string, secretKey string) (string, error) {
 	}
 
 	return tokenString, nil
+}
+
+func VerifyToken(tokenString string, secretKey string) (*jwt.Token, error) {
+	// Parse the token with the secret key
+	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+		return secretKey, nil
+	})
+
+	// Check for verification errors
+	if err != nil {
+		return nil, err
+	}
+
+	// Check if the token is valid
+	if !token.Valid {
+		return nil, fmt.Errorf("invalid token")
+	}
+
+	// Return the verified token
+	return token, nil
 }

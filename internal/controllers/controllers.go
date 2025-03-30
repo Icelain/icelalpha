@@ -3,13 +3,13 @@ package controllers
 import (
 	"context"
 	"encoding/json"
+	"icealpha/internal/controllers/jwtauth"
 	"icealpha/internal/controllers/oauth"
 	"icealpha/internal/controllers/user"
 	"icealpha/internal/database"
 	"icealpha/internal/router"
 	"log/slog"
 	"net/http"
-	"os"
 	"time"
 
 	"golang.org/x/oauth2"
@@ -18,7 +18,6 @@ import (
 // Start all controllers and configure cookie store
 func HandleAll(r *router.Router) {
 
-	var secretJWTKey = os.Getenv("SESSION_KEY")
 	// set oauth2 config
 	oauth.SetGithubOAuthConfig()
 
@@ -77,12 +76,12 @@ func HandleOAuthFlow(rtr *router.Router) http.HandlerFunc {
 
 		case "github":
 
-			if oauth.CheckSessionExists(r, rtr.S.CookieStore) {
+			// if oauth.CheckSessionExists(r, rtr.S.CookieStore) {
 
-				http.Redirect(w, r, "/api", http.StatusTemporaryRedirect)
-				return
+			// 	http.Redirect(w, r, "/api", http.StatusTemporaryRedirect)
+			// 	return
 
-			}
+			// }
 
 			state := oauth.SetNewOAuthStateCookie(w)
 			url := oauth.GithubOAuthConfig.AuthCodeURL(state, oauth2.ApprovalForce)
@@ -147,31 +146,29 @@ func HandleOAuthCallback(rtr *router.Router) http.HandlerFunc {
 
 				}
 
-				// create a user session cookie
-				session, err := rtr.S.CookieStore.Get(r, "usersession")
+				// create a user session jwt
+				tokenString, err := jwtauth.CreateJWTToken(githubUser.Email, rtr.S.JwtSession.SecretKey)
 				if err != nil {
 
-					http.Error(w, "error creating session cookie", http.StatusInternalServerError)
+					http.Error(w, "internal error occurred", http.StatusInternalServerError)
 					return
 
 				}
 
-				session.Options.MaxAge = int(time.Now().Add(time.Hour * 24).Unix())
-				session.Values["username"] = githubUser.Username
-				session.Values["email"] = githubUser.Email
+				http.SetCookie(w, &http.Cookie{
 
-				if err = session.Save(r, w); err != nil {
-
-					http.Error(w, "error saving session cookie: "+err.Error(), http.StatusInternalServerError)
-					return
-
-				}
+					Name:     "jwtToken",
+					Value:    tokenString,
+					Expires:  time.Now().Add(time.Hour),
+					Path:     "/",
+					Secure:   false,
+					HttpOnly: true,
+				})
 
 				http.Redirect(w, r, redirectPath, http.StatusTemporaryRedirect)
 				return
 
 			}
-
 		}
 
 	}

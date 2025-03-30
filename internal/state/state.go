@@ -1,6 +1,7 @@
 package state
 
 import (
+	"icealpha/internal/controllers/jwtauth"
 	"icealpha/internal/database"
 	"icealpha/pkg/imglatex"
 	"icealpha/pkg/inference"
@@ -8,9 +9,9 @@ import (
 )
 
 type State struct {
-	JwtSecretkey string
-	DB           *database.PostgresDriver
-	CreditCache  *sync.Map
-	ImgLatex     *imglatex.ImgLatex
-	LLMClient    inference.LLMClient
+	JwtSession  *jwtauth.JWTSession
+	DB          *database.PostgresDriver
+	CreditCache *sync.Map
+	ImgLatex    *imglatex.ImgLatex
+	LLMClient   inference.LLMClient
 }

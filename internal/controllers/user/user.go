@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"icealpha/internal/controllers/auth"
+	"icealpha/internal/controllers/jwtauth"
 	"icealpha/internal/router"
 
 	"bytes"
@@ -173,18 +174,7 @@ func HandleSolveTextInput(rtr *router.Router) http.HandlerFunc {
 
 	return func(w http.ResponseWriter, r *http.Request) {
 
-		userSession, err := rtr.S.CookieStore.Get(
-			r, "usersession",
-		)
-
-		if err != nil {
-
-			http.Error(w, "User session expired", http.StatusBadRequest)
-			return
-
-		}
-
-		userEmail := userSession.Values["email"].(string)
+		userEmail := r.Context().Value("userEmail").(string)
 
 		credits, ok := rtr.S.CreditCache.Load(userEmail)
 		if !ok {
@@ -262,14 +252,28 @@ func AuthMiddleware(next http.HandlerFunc, rtr *router.Router) http.HandlerFunc 
 
 	return func(w http.ResponseWriter, r *http.Request) {
 
-		if !auth.CheckSessionExists(r, rtr.S.CookieStore) {
+		jwtTokenCookie, err := r.Cookie("jwtToken")
+		if err != nil {
 
-			http.Redirect(w, r, "/api", http.StatusTemporaryRedirect)
+			http.Error(w, "not authorized", http.StatusUnauthorized)
+			return
+		}
+
+		token, err := jwtauth.VerifyToken(jwtTokenCookie.Value, rtr.S.JwtSession.SecretKey)
+		if err != nil {
+
+			http.Error(w, "not authorized", http.StatusUnauthorized)
 			return
 
 		}
 
-		next.ServeHTTP(w, r)
+		email, err := token.Claims.GetSubject()
+		if err != nil {
+
+			http.Error(w, "not authorized", http.StatusUnauthorized)
+			return
+		}
+		next.ServeHTTP(w, r.WithContext(context.WithValue(context.Background(), "userEmail", email)))
 
 	}
 
