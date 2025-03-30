@@ -49,6 +49,15 @@ func TestController(rtr *router.Router) http.HandlerFunc {
 	}
 }
 
+func NonAuthTestController(rtr *router.Router) http.HandlerFunc {
+
+	return func(w http.ResponseWriter, r *http.Request) {
+
+		w.Write([]byte("Test(non auth)"))
+
+	}
+}
+
 // POST(problem: multipart[image]) -> Json(content: string)
 func HandleSolveInputImage(rtr *router.Router) http.HandlerFunc {
 

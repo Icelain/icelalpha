@@ -38,12 +38,14 @@ func HandleAll(r *router.Router) {
 	r.S.CookieStore = sessions.NewCookieStore([]byte("SESSION_KEY"))
 
 	r.R.Get("/api", HandleAPIIndex(r))
-	r.R.Get("/api/oauth", HandleOAuthFlow(r))
-	r.R.Get("/api/oauth/logout", HandleOAuthLogout(r))
-	r.R.Get("/api/oauth/{provider}/callback", HandleOAuthCallback(r))
+
 	r.R.Post("/api/user/handleimage", user.AuthMiddleware(user.HandleSolveInputImage(r), r))
 	r.R.Post("/api/user/handletext", user.AuthMiddleware(user.HandleSolveTextInput(r), r))
 	r.R.Post("/api/user/test", user.AuthMiddleware(user.TestController(r), r))
+
+	r.R.Get("/api/oauth", HandleOAuthFlow(r))
+	r.R.Get("/api/oauth/logout", HandleOAuthLogout(r))
+	r.R.Get("/api/oauth/{provider}/callback", HandleOAuthCallback(r))
 }
 
 // GET :: -> Json(status: string)
