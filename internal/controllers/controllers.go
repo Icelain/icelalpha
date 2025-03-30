@@ -134,6 +134,7 @@ func HandleOAuthCallback(rtr *router.Router) http.HandlerFunc {
 
 					}
 
+					rtr.Logger.Info("here")
 					http.Redirect(w, r, "/api", http.StatusTemporaryRedirect)
 					return
 
