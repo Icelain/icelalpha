@@ -76,12 +76,20 @@ func HandleOAuthFlow(rtr *router.Router) http.HandlerFunc {
 
 		case "github":
 
-			// if oauth.CheckSessionExists(r, rtr.S.CookieStore) {
+			if jwtTokenCookie, err := r.Cookie("jwtToken"); err == nil {
 
-			// 	http.Redirect(w, r, "/api", http.StatusTemporaryRedirect)
-			// 	return
+				if jwtToken, err := jwtauth.VerifyToken(jwtTokenCookie.Value); err == nil {
 
-			// }
+					if _, err := jwtToken.Claims.GetSubject(); err == nil {
+
+						http.Redirect(w, r, "/api", http.StatusTemporaryRedirect)
+						return
+
+					}
+
+				}
+
+			}
 
 			state := oauth.SetNewOAuthStateCookie(w)
 			url := oauth.GithubOAuthConfig.AuthCodeURL(state, oauth2.ApprovalForce)
@@ -179,15 +187,7 @@ func HandleOAuthLogout(rtr *router.Router) http.HandlerFunc {
 
 	return func(w http.ResponseWriter, r *http.Request) {
 
-		session, err := rtr.S.CookieStore.Get(r, "usersession")
-		if err != nil {
-
-			return
-
-		}
-
-		// clear out previous session
-		session.Values = map[interface{}]interface{}{}
+		http.SetCookie(w, &http.Cookie{Name: "jwtToken", Value: "loggedOut"})
 
 	}
 

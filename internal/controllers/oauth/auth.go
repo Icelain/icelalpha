@@ -59,19 +59,6 @@ func SetNewOAuthStateCookie(w http.ResponseWriter) string {
 	return state
 }
 
-func CheckSessionExists(r *http.Request, session *sessions.CookieStore) bool {
-
-	userSession, err := session.Get(r, "usersession")
-	if err != nil {
-
-		return false
-
-	}
-
-	return !userSession.IsNew && len(userSession.Values) == 0
-
-}
-
 func HandleGithubOAuthCallback(router *router.Router, githubOAuthConfig *oauth2.Config, w http.ResponseWriter, r *http.Request) (GithubUser, string, error) {
 
 	u := GithubUser{}
