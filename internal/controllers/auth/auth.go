@@ -61,14 +61,14 @@ func SetNewOAuthStateCookie(w http.ResponseWriter) string {
 
 func CheckSessionExists(r *http.Request, session *sessions.CookieStore) bool {
 
-	usersession, err := session.Get(r, "usersession")
+	userSession, err := session.Get(r, "usersession")
 	if err != nil {
 
 		return false
 
 	}
 
-	return !usersession.IsNew
+	return !userSession.IsNew && len(userSession.Values) == 0
 
 }
 

@@ -43,6 +43,7 @@ func HandleAll(r *router.Router) {
 	r.R.Get("/api/oauth/{provider}/callback", HandleOAuthCallback(r))
 	r.R.Post("/api/user/handleimage", user.AuthMiddleware(user.HandleSolveInputImage(r), r))
 	r.R.Post("/api/user/handletext", user.AuthMiddleware(user.HandleSolveTextInput(r), r))
+	r.R.Post("/api/user/test", user.AuthMiddleware(user.TestController(r), r))
 }
 
 // GET :: -> Json(status: string)

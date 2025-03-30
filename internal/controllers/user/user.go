@@ -40,6 +40,15 @@ func validateImageFile(r *http.Request) (bool, error) {
 	return validImageTypes[contentType], nil
 }
 
+func TestController(rtr *router.Router) http.HandlerFunc {
+
+	return func(w http.ResponseWriter, r *http.Request) {
+
+		w.Write([]byte("Test"))
+
+	}
+}
+
 // POST(problem: multipart[image]) -> Json(content: string)
 func HandleSolveInputImage(rtr *router.Router) http.HandlerFunc {
 
@@ -250,6 +259,7 @@ func AuthMiddleware(next http.HandlerFunc, rtr *router.Router) http.HandlerFunc 
 			return
 
 		}
+
 		next.ServeHTTP(w, r)
 
 	}
