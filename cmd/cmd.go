@@ -9,6 +9,7 @@ import (
 	"icealpha/pkg/inference"
 	"log"
 	"os"
+	"sync"
 )
 
 func Execute() {
@@ -28,11 +29,12 @@ func Execute() {
 	srv := router.NewRouter()
 	srvconfig := router.RouterConfig{
 
-		Port:       flags.HttpPort,
-		DB:         db,
-		ImgLatex:   imglatex.NewImgLatex(os.Getenv("GROQ_API_KEY")),
-		LLMClient:  inference.NewClaudeLLMClient(os.Getenv("CLAUDE_API_KEY")),
-		JWTSession: jwtauth.NewJWTSession(os.Getenv("SESSION_KEY")),
+		Port:        flags.HttpPort,
+		DB:          db,
+		ImgLatex:    imglatex.NewImgLatex(os.Getenv("GROQ_API_KEY")),
+		LLMClient:   inference.NewClaudeLLMClient(os.Getenv("CLAUDE_API_KEY")),
+		JWTSession:  jwtauth.NewJWTSession(os.Getenv("SESSION_KEY")),
+		CreditCache: &sync.Map{},
 	}
 
 	srv.SetConfig(&srvconfig)

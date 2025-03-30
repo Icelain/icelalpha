@@ -10,6 +10,7 @@ import (
 	"log/slog"
 	"net/http"
 	"os"
+	"sync"
 
 	"github.com/go-chi/chi/v5"
 )
@@ -42,11 +43,12 @@ func NewRouter() *Router {
 
 // Configuration struct for Router
 type RouterConfig struct {
-	Port       uint
-	DB         *database.PostgresDriver
-	ImgLatex   *imglatex.ImgLatex
-	LLMClient  inference.LLMClient
-	JWTSession *jwtauth.JWTSession
+	Port        uint
+	DB          *database.PostgresDriver
+	ImgLatex    *imglatex.ImgLatex
+	LLMClient   inference.LLMClient
+	JWTSession  *jwtauth.JWTSession
+	CreditCache *sync.Map
 }
 
 func (r *Router) SetConfig(config *RouterConfig) {
@@ -56,6 +58,7 @@ func (r *Router) SetConfig(config *RouterConfig) {
 	r.S.ImgLatex = config.ImgLatex
 	r.S.LLMClient = config.LLMClient
 	r.S.JwtSession = config.JWTSession
+	r.S.CreditCache = config.CreditCache
 
 }
 func (r *Router) Serve() error {

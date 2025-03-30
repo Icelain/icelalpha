@@ -87,7 +87,7 @@ func (pd *PostgresDriver) CheckUserExists(ctx context.Context, email string) boo
 	var exists bool
 	res.Scan(&exists)
 
-	println(exists)
+	println(exists, "here")
 
 	return exists
 
