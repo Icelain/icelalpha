@@ -78,7 +78,7 @@ func HandleOAuthFlow(rtr *router.Router) http.HandlerFunc {
 
 			if jwtTokenCookie, err := r.Cookie("jwtToken"); err == nil {
 
-				if jwtToken, err := jwtauth.VerifyToken(jwtTokenCookie.Value); err == nil {
+				if jwtToken, err := jwtauth.VerifyToken(jwtTokenCookie.Value, rtr.S.JwtSession.SecretKey); err == nil {
 
 					if _, err := jwtToken.Claims.GetSubject(); err == nil {
 
