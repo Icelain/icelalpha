@@ -201,6 +201,7 @@ func HandleOAuthLogout(rtr *router.Router) http.HandlerFunc {
 
 		}
 
+		http.Redirect(w, r, "localhost:3000/", http.StatusTemporaryRedirect)
 	}
 
 }
