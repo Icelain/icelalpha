@@ -33,7 +33,7 @@ func Execute() {
 		DB:          db,
 		ImgLatex:    imglatex.NewImgLatex(os.Getenv("GROQ_API_KEY")),
 		LLMClient:   inference.NewClaudeLLMClient(os.Getenv("CLAUDE_API_KEY")),
-		JWTSession:  jwtauth.NewJWTSession(os.Getenv("SESSION_KEY")),
+		JWTSession:  jwtauth.NewJWTSession([]byte(os.Getenv("SESSION_KEY"))),
 		CreditCache: &sync.Map{},
 	}
 

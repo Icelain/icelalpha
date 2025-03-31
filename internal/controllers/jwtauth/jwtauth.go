@@ -7,16 +7,16 @@ import (
 )
 
 type JWTSession struct {
-	SecretKey string
+	SecretKey []byte
 }
 
-func NewJWTSession(secretKey string) *JWTSession {
+func NewJWTSession(secretKey []byte) *JWTSession {
 
 	return &JWTSession{SecretKey: secretKey}
 
 }
 
-func CreateJWTToken(email string, secretKey string) (string, error) {
+func CreateJWTToken(email string, secretKey []byte) (string, error) {
 	// Create a new JWT token with claims
 	claims := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"sub": email,                            // Subject (user identifier)
@@ -27,13 +27,14 @@ func CreateJWTToken(email string, secretKey string) (string, error) {
 
 	tokenString, err := claims.SignedString(secretKey)
 	if err != nil {
+		println(err.Error())
 		return "", err
 	}
 
 	return tokenString, nil
 }
 
-func VerifyToken(tokenString string, secretKey string) (*jwt.Token, error) {
+func VerifyToken(tokenString string, secretKey []byte) (*jwt.Token, error) {
 	// Parse the token with the secret key
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		return secretKey, nil

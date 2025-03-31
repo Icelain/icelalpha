@@ -86,9 +86,6 @@ func (pd *PostgresDriver) CheckUserExists(ctx context.Context, email string) boo
 
 	var exists bool
 	res.Scan(&exists)
-
-	println(exists, "here")
-
 	return exists
 
 }
@@ -97,7 +94,7 @@ func (pd *PostgresDriver) CheckUserExists(ctx context.Context, email string) boo
 func (pd *PostgresDriver) GetUser(ctx context.Context, email string) (types.User, error) {
 
 	result := types.User{}
-	res, err := pd.conn.Query(ctx, "SELECT (uuid, username, email, credits) FROM usersrecord WHERE email=$1", email)
+	res, err := pd.conn.Query(ctx, "SELECT (id, username, email, credits) FROM usersrecord WHERE email=$1", email)
 
 	if err != nil {
 
@@ -110,7 +107,6 @@ func (pd *PostgresDriver) GetUser(ctx context.Context, email string) (types.User
 	result.UUID, err = uuid.FromBytes(pgxUuid.Bytes[:])
 
 	if err != nil {
-
 		return types.User{}, err
 
 	}

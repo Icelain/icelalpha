@@ -128,13 +128,11 @@ func HandleOAuthCallback(rtr *router.Router) http.HandlerFunc {
 
 					if err := rtr.S.DB.InsertUser(context.Background(), githubUser.Username, githubUser.Email); err != nil {
 
-						rtr.Logger.Info("error:" + err.Error())
 						http.Error(w, "error creating user", http.StatusInternalServerError)
 						return
 
 					}
 
-					rtr.Logger.Info("here")
 					http.Redirect(w, r, "/api", http.StatusTemporaryRedirect)
 					return
 
@@ -158,7 +156,6 @@ func HandleOAuthCallback(rtr *router.Router) http.HandlerFunc {
 				// create a user session jwt
 				tokenString, err := jwtauth.CreateJWTToken(githubUser.Email, rtr.S.JwtSession.SecretKey)
 				if err != nil {
-
 					http.Error(w, "internal error occurred", http.StatusInternalServerError)
 					return
 
