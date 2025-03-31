@@ -9,12 +9,12 @@ import (
 
 type JWTSession struct {
 	SecretKey []byte
-	TokenPool sync.Map
+	TokenPool *sync.Map
 }
 
 func NewJWTSession(secretKey []byte) *JWTSession {
 
-	return &JWTSession{SecretKey: secretKey}
+	return &JWTSession{SecretKey: secretKey, TokenPool: &sync.Map{}}
 
 }
 

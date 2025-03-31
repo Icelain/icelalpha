@@ -70,17 +70,21 @@ func HandleOAuthFlow(rtr *router.Router) http.HandlerFunc {
 
 	return func(w http.ResponseWriter, r *http.Request) {
 
-		if jwtTokenCookie, err := r.Cookie("jwtToken"); err == nil {
+		jwtToken := r.URL.Query().Get("jwtToken")
 
-			if jwtToken, err := jwtauth.VerifyToken(jwtTokenCookie.Value, rtr.S.JwtSession.SecretKey); err == nil {
+		if jwtToken != "" {
 
-				if _, err := jwtToken.Claims.GetSubject(); err == nil {
+			if token, ok := rtr.S.JwtSession.TokenPool.Load(jwtToken); ok {
+				if jwtToken, err := jwtauth.VerifyToken(token.(string), rtr.S.JwtSession.SecretKey); err == nil {
 
-					http.Redirect(w, r, "/api", http.StatusTemporaryRedirect)
-					return
+					if _, err := jwtToken.Claims.GetSubject(); err == nil {
+
+						http.Redirect(w, r, "/api", http.StatusTemporaryRedirect)
+						return
+
+					}
 
 				}
-
 			}
 
 		}
