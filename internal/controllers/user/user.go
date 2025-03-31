@@ -243,7 +243,6 @@ func AuthMiddleware(next http.HandlerFunc, rtr *router.Router) http.HandlerFunc 
 		jwtToken := r.Header.Get("jwttoken")
 
 		if _, ok := rtr.S.JwtSession.TokenPool.Load(jwtToken); !ok {
-
 			http.Error(w, "not authorized", http.StatusUnauthorized)
 			return
 
