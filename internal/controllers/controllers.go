@@ -8,6 +8,7 @@ import (
 	"icealpha/internal/controllers/user"
 	"icealpha/internal/database"
 	"icealpha/internal/router"
+	"icealpha/internal/types"
 	"log/slog"
 	"net/http"
 	"time"
@@ -117,11 +118,10 @@ func HandleOAuthCallback(rtr *router.Router) http.HandlerFunc {
 		case "github":
 
 			var githubUser oauth.GithubUser
-			var redirectPath string
 			var err error
 			switch provider {
 			case "github":
-				githubUser, redirectPath, err = oauth.HandleGithubOAuthCallback(rtr, oauth.GithubOAuthConfig, w, r)
+				githubUser, _, err = oauth.HandleGithubOAuthCallback(rtr, oauth.GithubOAuthConfig, w, r)
 				if err != nil {
 					rtr.Logger.Error("err handling github oauth callback", "err", err)
 					//http.Redirect(w, r, "/login", http.StatusSeeOther)
@@ -175,10 +175,14 @@ func HandleOAuthCallback(rtr *router.Router) http.HandlerFunc {
 				// 	HttpOnly: true,
 				// })
 
-				rtr.S.JwtSession.TokenPool.Store(tokenString, struct{}{})
+				if err := json.NewEncoder(w).Encode(&types.JWTCreatedResponse{Token: tokenString}); err != nil {
 
-				http.Redirect(w, r, redirectPath, http.StatusTemporaryRedirect)
-				return
+					http.Error(w, "internal error occurred while creating jwttoken", http.StatusInternalServerError)
+					return
+
+				}
+
+				rtr.S.JwtSession.TokenPool.Store(tokenString, struct{}{})
 
 			}
 		}
