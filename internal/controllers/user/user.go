@@ -2,12 +2,12 @@ package user
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"icealpha/internal/controllers/jwtauth"
 	"icealpha/internal/router"
 
 	"bytes"
+	"encoding/json"
 	"io"
 	"net/http"
 )
@@ -240,14 +240,9 @@ func AuthMiddleware(next http.HandlerFunc, rtr *router.Router) http.HandlerFunc 
 
 	return func(w http.ResponseWriter, r *http.Request) {
 
-		jwtTokenCookie, err := r.Cookie("jwtToken")
-		if err != nil {
+		jwtToken := r.Header.Get("jwttoken")
 
-			http.Error(w, "not authorized", http.StatusUnauthorized)
-			return
-		}
-
-		token, err := jwtauth.VerifyToken(jwtTokenCookie.Value, rtr.S.JwtSession.SecretKey)
+		token, err := jwtauth.VerifyToken(jwtToken, rtr.S.JwtSession.SecretKey)
 		if err != nil {
 
 			http.Error(w, "not authorized", http.StatusUnauthorized)
