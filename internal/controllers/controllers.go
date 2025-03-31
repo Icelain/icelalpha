@@ -70,26 +70,26 @@ func HandleOAuthFlow(rtr *router.Router) http.HandlerFunc {
 
 	return func(w http.ResponseWriter, r *http.Request) {
 
+		if jwtTokenCookie, err := r.Cookie("jwtToken"); err == nil {
+
+			if jwtToken, err := jwtauth.VerifyToken(jwtTokenCookie.Value, rtr.S.JwtSession.SecretKey); err == nil {
+
+				if _, err := jwtToken.Claims.GetSubject(); err == nil {
+
+					http.Redirect(w, r, "/api", http.StatusTemporaryRedirect)
+					return
+
+				}
+
+			}
+
+		}
+
 		provider := r.URL.Query().Get("provider")
 
 		switch provider {
 
 		case "github":
-
-			if jwtTokenCookie, err := r.Cookie("jwtToken"); err == nil {
-
-				if jwtToken, err := jwtauth.VerifyToken(jwtTokenCookie.Value, rtr.S.JwtSession.SecretKey); err == nil {
-
-					if _, err := jwtToken.Claims.GetSubject(); err == nil {
-
-						http.Redirect(w, r, "/api", http.StatusTemporaryRedirect)
-						return
-
-					}
-
-				}
-
-			}
 
 			state := oauth.SetNewOAuthStateCookie(w)
 			url := oauth.GithubOAuthConfig.AuthCodeURL(state, oauth2.ApprovalForce)
@@ -161,15 +161,17 @@ func HandleOAuthCallback(rtr *router.Router) http.HandlerFunc {
 
 				}
 
-				http.SetCookie(w, &http.Cookie{
+				// http.SetCookie(w, &http.Cookie{
 
-					Name:     "jwtToken",
-					Value:    tokenString,
-					Expires:  time.Now().Add(time.Hour),
-					Path:     "/",
-					Secure:   false,
-					HttpOnly: true,
-				})
+				// 	Name:     "jwtToken",
+				// 	Value:    tokenString,
+				// 	Expires:  time.Now().Add(time.Hour),
+				// 	Path:     "/",
+				// 	Secure:   false,
+				// 	HttpOnly: true,
+				// })
+
+				rtr.S.JwtSession.TokenPool.Store(tokenString, struct{}{})
 
 				http.Redirect(w, r, redirectPath, http.StatusTemporaryRedirect)
 				return

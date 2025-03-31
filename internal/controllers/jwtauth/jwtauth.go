@@ -3,11 +3,13 @@ package jwtauth
 import (
 	"fmt"
 	"github.com/golang-jwt/jwt/v5"
+	"sync"
 	"time"
 )
 
 type JWTSession struct {
 	SecretKey []byte
+	TokenPool sync.Map
 }
 
 func NewJWTSession(secretKey []byte) *JWTSession {
@@ -27,7 +29,6 @@ func CreateJWTToken(email string, secretKey []byte) (string, error) {
 
 	tokenString, err := claims.SignedString(secretKey)
 	if err != nil {
-		println(err.Error())
 		return "", err
 	}
 

@@ -11,7 +11,7 @@ func Sync(postgresDriver *PostgresDriver, cache *sync.Map) error {
 
 	cache.Range(func(key, value any) bool {
 
-		if err = postgresDriver.UpdateUserCredits(context.Background(), key.(string), value.(uint)); err != nil {
+		if err = postgresDriver.UpdateUserCredits(context.Background(), key.(string), value.(uint64)); err != nil {
 
 			return false
 

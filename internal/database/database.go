@@ -147,7 +147,7 @@ func (pd *PostgresDriver) UpdateUsername(ctx context.Context, email string, newU
 }
 
 // directly update user credits
-func (pd *PostgresDriver) UpdateUserCredits(ctx context.Context, email string, newcredits uint) error {
+func (pd *PostgresDriver) UpdateUserCredits(ctx context.Context, email string, newcredits uint64) error {
 
 	_, err := pd.conn.Exec(ctx, `UPDATE usersrecord SET credits=$1 WHERE email=$2`, newcredits, email)
 	return err
