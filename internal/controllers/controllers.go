@@ -124,9 +124,11 @@ func HandleOAuthCallback(rtr *router.Router) http.HandlerFunc {
 				githubUser, _, err = oauth.HandleGithubOAuthCallback(rtr, oauth.GithubOAuthConfig, w, r)
 				if err != nil {
 					rtr.Logger.Error("err handling github oauth callback", "err", err)
-					//http.Redirect(w, r, "/login", http.StatusSeeOther)
+					http.Redirect(w, r, "localhost:3000", http.StatusSeeOther)
 					return
 				}
+
+				var justCreated bool
 
 				if !rtr.S.DB.CheckUserExists(context.Background(), githubUser.Email) {
 
@@ -137,24 +139,29 @@ func HandleOAuthCallback(rtr *router.Router) http.HandlerFunc {
 
 					}
 
-					http.Redirect(w, r, "/api", http.StatusTemporaryRedirect)
-					return
+					justCreated = true
 
 				}
 
-				_, ok := rtr.S.CreditCache.Load(githubUser.Email)
-				if !ok {
+				if justCreated {
 
-					user, err := rtr.S.DB.GetUser(context.Background(), githubUser.Email)
-					if err != nil {
+					rtr.S.CreditCache.Store(githubUser.Email, 5)
 
-						http.Error(w, "internal error occurred", http.StatusInternalServerError)
-						return
+				} else {
+					_, ok := rtr.S.CreditCache.Load(githubUser.Email)
+					if !ok {
+
+						user, err := rtr.S.DB.GetUser(context.Background(), githubUser.Email)
+						if err != nil {
+
+							http.Error(w, "internal error occurred", http.StatusInternalServerError)
+							return
+
+						}
+
+						rtr.S.CreditCache.Store(githubUser.Email, user.CreditBalance)
 
 					}
-
-					rtr.S.CreditCache.Store(githubUser.Email, user.CreditBalance)
-
 				}
 
 				// create a user session jwt
