@@ -195,7 +195,11 @@ func HandleOAuthLogout(rtr *router.Router) http.HandlerFunc {
 
 	return func(w http.ResponseWriter, r *http.Request) {
 
-		http.SetCookie(w, &http.Cookie{Name: "jwtToken", Value: "loggedOut"})
+		if token := r.Header.Get("jwttoken"); token != "" {
+
+			rtr.S.JwtSession.TokenPool.Delete(token)
+
+		}
 
 	}
 
