@@ -3,12 +3,12 @@ package controllers
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"icealpha/internal/controllers/jwtauth"
 	"icealpha/internal/controllers/oauth"
 	"icealpha/internal/controllers/user"
 	"icealpha/internal/database"
 	"icealpha/internal/router"
-	"icealpha/internal/types"
 	"log/slog"
 	"net/http"
 	"time"
@@ -175,12 +175,7 @@ func HandleOAuthCallback(rtr *router.Router) http.HandlerFunc {
 				// 	HttpOnly: true,
 				// })
 
-				if err := json.NewEncoder(w).Encode(&types.JWTCreatedResponse{Token: tokenString}); err != nil {
-
-					http.Error(w, "internal error occurred while creating jwttoken", http.StatusInternalServerError)
-					return
-
-				}
+				http.Redirect(w, r, fmt.Sprintf("/dummyboard?jwtToken=%s", tokenString), http.StatusTemporaryRedirect)
 
 				rtr.S.JwtSession.TokenPool.Store(tokenString, struct{}{})
 
