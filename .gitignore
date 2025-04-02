@@ -1,2 +1,3 @@
 ./icealpha
 .env
+./frontend/node_modules
