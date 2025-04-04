@@ -21,6 +21,7 @@ func HandleAll(r *router.Router) {
 
 	// set oauth2 config
 	oauth.SetGithubOAuthConfig()
+	oauth.SetGoogleOAuthConfig()
 
 	// complete database syncing
 	go func() {
@@ -100,6 +101,12 @@ func HandleOAuthFlow(rtr *router.Router) http.HandlerFunc {
 			url := oauth.GithubOAuthConfig.AuthCodeURL(state, oauth2.ApprovalForce)
 			http.Redirect(w, r, url, http.StatusTemporaryRedirect)
 
+		case "google":
+
+			state := oauth.SetNewOAuthStateCookie(w)
+			url := oauth.GoogleOAuthConfig.AuthCodeURL(state, oauth2.ApprovalForce)
+			http.Redirect(w, r, url, http.StatusTemporaryRedirect)
+
 		}
 
 	}
@@ -121,7 +128,7 @@ func HandleOAuthCallback(rtr *router.Router) http.HandlerFunc {
 			var err error
 			switch provider {
 			case "github":
-				githubUser, _, err = oauth.HandleGithubOAuthCallback(rtr, oauth.GithubOAuthConfig, w, r)
+				githubUser, _, err = oauth.HandleGithubOAuthCallback(rtr, w, r)
 				if err != nil {
 					rtr.Logger.Error("err handling github oauth callback", "err", err)
 					http.Redirect(w, r, "localhost:3000", http.StatusSeeOther)
