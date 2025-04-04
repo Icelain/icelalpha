@@ -143,6 +143,13 @@ func HandleOAuthCallback(rtr *router.Router) http.HandlerFunc {
 			var err error
 
 			googleUser, _, err = oauth.HandleGoogleCallback(rtr, w, r)
+			if err != nil {
+				rtr.Logger.Error("err handling google oauth callback", "err", err)
+				http.Redirect(w, r, "localhost:3000", http.StatusSeeOther)
+				return
+			}
+
+			user = googleUser
 
 		}
 
