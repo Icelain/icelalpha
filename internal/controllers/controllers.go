@@ -142,6 +142,8 @@ func HandleOAuthCallback(rtr *router.Router) http.HandlerFunc {
 			var googleUser oauth.GoogleUser
 			var err error
 
+			googleUser, _, err = oauth.HandleGoogleCallback(rtr, w, r)
+
 		}
 
 		var justCreated bool
