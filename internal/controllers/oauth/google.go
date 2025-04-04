@@ -40,17 +40,28 @@ var GoogleOAuthConfig *oauth2.Config
 
 const oauthGoogleUserInfoURL = "https://www.googleapis.com/oauth2/v2/userinfo?access_token="
 
-func SetGoogleOAuthConfig() {
+func SetGoogleOAuthConfig() error {
+
+	clientId := os.Getenv("GOOGLE_CLIENT_ID")
+	clientSecret := os.Getenv("GOOGLE_CLIENT_SECRET")
+
+	if clientId == "" || clientSecret == "" {
+
+		return errors.New("Google ClientID or/and ClientSecret not found")
+
+	}
 	GoogleOAuthConfig = &oauth2.Config{
 		RedirectURL:  "http://localhost:8080/oauth/google/callback",
-		ClientID:     os.Getenv("GOOGLE_CLIENT_ID"),
-		ClientSecret: os.Getenv("GOOGLE_CLIENT_SECRET"),
+		ClientID:     clientId,
+		ClientSecret: clientSecret,
 		Scopes: []string{
 			"https://www.googleapis.com/auth/userinfo.email",
 			"https://www.googleapis.com/auth/userinfo.profile",
 		},
 		Endpoint: google.Endpoint,
 	}
+
+	return nil
 }
 
 func HandleGoogleCallback(rtr *router.Router, w http.ResponseWriter, r *http.Request) (GoogleUser, string, error) {
