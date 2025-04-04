@@ -49,7 +49,7 @@ func SetGithubOAuthConfig() error {
 
 	if clientId == "" || clientSecret == "" {
 
-		return errors.New("ClientID or/and ClientSecret not found")
+		return errors.New("Github ClientID or/and ClientSecret not found")
 
 	}
 
