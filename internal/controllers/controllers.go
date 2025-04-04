@@ -120,81 +120,82 @@ func HandleOAuthCallback(rtr *router.Router) http.HandlerFunc {
 
 		provider := r.PathValue("provider")
 
+		var user oauth.AuthUser
+
 		switch provider {
 
 		case "github":
 
 			var githubUser oauth.GithubUser
 			var err error
-			switch provider {
-			case "github":
-				githubUser, _, err = oauth.HandleGithubOAuthCallback(rtr, w, r)
+			githubUser, _, err = oauth.HandleGithubOAuthCallback(rtr, w, r)
+			if err != nil {
+				rtr.Logger.Error("err handling github oauth callback", "err", err)
+				http.Redirect(w, r, "localhost:3000", http.StatusSeeOther)
+				return
+			}
+
+			user = githubUser
+
+		}
+
+		var justCreated bool
+
+		if !rtr.S.DB.CheckUserExists(context.Background(), user.GetEmail()) {
+
+			if err := rtr.S.DB.InsertUser(context.Background(), user.GetUsername(), user.GetEmail()); err != nil {
+
+				http.Error(w, "error creating user", http.StatusInternalServerError)
+				return
+
+			}
+
+			justCreated = true
+
+		}
+
+		if justCreated {
+
+			rtr.S.CreditCache.Store(user.GetEmail(), 5)
+
+		} else {
+			_, ok := rtr.S.CreditCache.Load(user.GetEmail())
+			if !ok {
+
+				dbUser, err := rtr.S.DB.GetUser(context.Background(), user.GetEmail())
 				if err != nil {
-					rtr.Logger.Error("err handling github oauth callback", "err", err)
-					http.Redirect(w, r, "localhost:3000", http.StatusSeeOther)
-					return
-				}
 
-				var justCreated bool
-
-				if !rtr.S.DB.CheckUserExists(context.Background(), githubUser.Email) {
-
-					if err := rtr.S.DB.InsertUser(context.Background(), githubUser.Username, githubUser.Email); err != nil {
-
-						http.Error(w, "error creating user", http.StatusInternalServerError)
-						return
-
-					}
-
-					justCreated = true
-
-				}
-
-				if justCreated {
-
-					rtr.S.CreditCache.Store(githubUser.Email, 5)
-
-				} else {
-					_, ok := rtr.S.CreditCache.Load(githubUser.Email)
-					if !ok {
-
-						user, err := rtr.S.DB.GetUser(context.Background(), githubUser.Email)
-						if err != nil {
-
-							http.Error(w, "internal error occurred", http.StatusInternalServerError)
-							return
-
-						}
-
-						rtr.S.CreditCache.Store(githubUser.Email, user.CreditBalance)
-
-					}
-				}
-
-				// create a user session jwt
-				tokenString, err := jwtauth.CreateJWTToken(githubUser.Email, rtr.S.JwtSession.SecretKey)
-				if err != nil {
 					http.Error(w, "internal error occurred", http.StatusInternalServerError)
 					return
 
 				}
 
-				// http.SetCookie(w, &http.Cookie{
-
-				// 	Name:     "jwtToken",
-				// 	Value:    tokenString,
-				// 	Expires:  time.Now().Add(time.Hour),
-				// 	Path:     "/",
-				// 	Secure:   false,
-				// 	HttpOnly: true,
-				// })
-
-				http.Redirect(w, r, fmt.Sprintf("/dummyboard?jwtToken=%s", tokenString), http.StatusTemporaryRedirect)
-
-				rtr.S.JwtSession.TokenPool.Store(tokenString, struct{}{})
+				rtr.S.CreditCache.Store(dbUser.Email, dbUser.CreditBalance)
 
 			}
 		}
+
+		// create a user session jwt
+		tokenString, err := jwtauth.CreateJWTToken(user.GetEmail(), rtr.S.JwtSession.SecretKey)
+		if err != nil {
+			http.Error(w, "internal error occurred", http.StatusInternalServerError)
+			return
+
+		}
+
+		// http.SetCookie(w, &http.Cookie{
+
+		// 	Name:     "jwtToken",
+		// 	Value:    tokenString,
+		// 	Expires:  time.Now().Add(time.Hour),
+		// 	Path:     "/",
+		// 	Secure:   false,
+		// 	HttpOnly: true,
+		// })
+
+		http.Redirect(w, r, fmt.Sprintf("/dummyboard?jwtToken=%s", tokenString), http.StatusTemporaryRedirect)
+
+		rtr.S.JwtSession.TokenPool.Store(tokenString, struct{}{})
 
 	}
 

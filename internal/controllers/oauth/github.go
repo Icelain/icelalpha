@@ -28,6 +28,21 @@ type GithubUser struct {
 	AvatarURL string `json:"avatar_url"`
 }
 
+func (g GithubUser) GetEmail() string {
+
+	return g.Email
+}
+
+func (g GithubUser) GetUsername() string {
+
+	return g.Username
+}
+
+func (g GithubUser) GetAvatarURL() string {
+
+	return g.AvatarURL
+}
+
 func SetGithubOAuthConfig() {
 
 	GithubOAuthConfig = &oauth2.Config{

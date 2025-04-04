@@ -20,6 +20,22 @@ type GoogleUser struct {
 	AvatarURL string `json:"picture"`
 }
 
+func (g GoogleUser) GetEmail() string {
+
+	return g.Email
+}
+
+func (g GoogleUser) GetUsername() string {
+
+	return g.FirstName + " " + g.LastName
+}
+
+func (g GoogleUser) GetAvatarURL() string {
+
+	return g.AvatarURL
+
+}
+
 var GoogleOAuthConfig *oauth2.Config
 
 const oauthGoogleUserInfoURL = "https://www.googleapis.com/oauth2/v2/userinfo?access_token="

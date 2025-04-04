@@ -8,6 +8,12 @@ import (
 	"time"
 )
 
+type AuthUser interface {
+	GetEmail() string
+	GetUsername() string
+	GetAvatarURL() string
+}
+
 func SetNewOAuthStateCookie(w http.ResponseWriter) string {
 	var expiration = time.Now().Add(24 * time.Hour)
 	b := make([]byte, 16)
