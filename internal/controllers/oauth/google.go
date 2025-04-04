@@ -51,7 +51,7 @@ func SetGoogleOAuthConfig() error {
 
 	}
 	GoogleOAuthConfig = &oauth2.Config{
-		RedirectURL:  "http://localhost:8080/oauth/google/callback",
+		RedirectURL:  "http://localhost:8080/api/oauth/google/callback",
 		ClientID:     clientId,
 		ClientSecret: clientSecret,
 		Scopes: []string{
