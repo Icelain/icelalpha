@@ -137,6 +137,11 @@ func HandleOAuthCallback(rtr *router.Router) http.HandlerFunc {
 
 			user = githubUser
 
+		case "google":
+
+			var googleUser oauth.GoogleUser
+			var err error
+
 		}
 
 		var justCreated bool
