@@ -20,8 +20,20 @@ import (
 func HandleAll(r *router.Router) {
 
 	// set oauth2 config
-	oauth.SetGithubOAuthConfig()
-	oauth.SetGoogleOAuthConfig()
+
+	var err error
+	if err = oauth.SetGithubOAuthConfig(); err != nil {
+
+		r.Logger.Error(err.Error())
+		return
+
+	}
+	if err = oauth.SetGoogleOAuthConfig(); err != nil {
+
+		r.Logger.Error(err.Error())
+		return
+
+	}
 
 	// complete database syncing
 	go func() {
