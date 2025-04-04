@@ -43,14 +43,24 @@ func (g GithubUser) GetAvatarURL() string {
 	return g.AvatarURL
 }
 
-func SetGithubOAuthConfig() {
+func SetGithubOAuthConfig() error {
+	clientId := os.Getenv("GITHUB_CLIENT_ID")
+	clientSecret := os.Getenv("GITHUB_CLIENT_SECRET")
+
+	if clientId == "" || clientSecret == "" {
+
+		return errors.New("ClientID or/and ClientSecret not found")
+
+	}
 
 	GithubOAuthConfig = &oauth2.Config{
 
-		ClientID:     os.Getenv("GITHUB_CLIENT_ID"),
-		ClientSecret: os.Getenv("GITHUB_CLIENT_SECRET"),
+		ClientID:     clientId,
+		ClientSecret: clientSecret,
 		Endpoint:     github.Endpoint,
 	}
+
+	return nil
 
 }
 
