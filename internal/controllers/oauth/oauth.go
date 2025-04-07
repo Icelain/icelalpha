@@ -8,6 +8,7 @@ import (
 	"time"
 )
 
+// implemented by all oauth2 providers
 type AuthUser interface {
 	GetEmail() string
 	GetUsername() string
