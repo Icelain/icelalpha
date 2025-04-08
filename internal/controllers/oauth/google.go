@@ -13,6 +13,7 @@ import (
 	"golang.org/x/oauth2/google"
 )
 
+// Google user with default oauth2 permissions
 type GoogleUser struct {
 	Email     string `json:"email"`
 	FirstName string `json:"given_name"`
