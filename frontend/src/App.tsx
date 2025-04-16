@@ -4,6 +4,7 @@ import { Router, Route } from "@solidjs/router";
 import LandingPage from "./pages/LandingPage";
 const AppPage = lazy(() => import("./pages/AppPage"));
 
+// route pages through solid router
 function App() {
   return (
     <Router>
